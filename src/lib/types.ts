@@ -83,6 +83,24 @@ export interface RowsResult {
   total: number;
 }
 
+export type ExportFormat = "json" | "xlsx";
+
+export interface ExportOpts {
+  source: "table" | "query";
+  format: ExportFormat;
+  path: string;
+  schema?: string | null;
+  table?: string | null;
+  filter?: string | null;
+  sort?: SortSpec | null;
+  sql?: string | null;
+}
+
+export interface ExportResult {
+  rows: number;
+  path: string;
+}
+
 export interface QueryOutcome {
   columns: RowColumn[];
   rows: Cell[][];

@@ -6,6 +6,7 @@ import { typeFamily } from "../lib/pgtypes";
 import type { ConnectionMeta, RowColumn, RowsResult, SortSpec, TableRef } from "../lib/types";
 import { CellValue } from "../components/CellValue";
 import { TypeBadge } from "../components/TypeBadge";
+import { ExportDialog } from "../components/ExportDialog";
 import "./DataTab.css";
 
 interface Props {
@@ -23,6 +24,7 @@ export function DataTab({ connection, table }: Props) {
   const [appliedFilter, setAppliedFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   // Reset view state whenever the selected table changes.
   useEffect(() => {
@@ -113,6 +115,9 @@ export function DataTab({ connection, table }: Props) {
           )}
         </div>
         <div style={{ flex: 1 }} />
+        <button className="btn btn-sm" onClick={() => setShowExport(true)}>
+          Export
+        </button>
         <button className="btn btn-sm" onClick={() => void load()} disabled={loading}>
           {loading ? "Loading…" : "Refresh"}
         </button>
@@ -186,6 +191,20 @@ export function DataTab({ connection, table }: Props) {
           Next ›
         </button>
       </div>
+
+      {showExport && (
+        <ExportDialog
+          source={{
+            kind: "table",
+            schema: table.schema,
+            table: table.name,
+            filter: appliedFilter.trim() || null,
+            sort,
+            defaultName: table.name,
+          }}
+          onClose={() => setShowExport(false)}
+        />
+      )}
     </div>
   );
 }

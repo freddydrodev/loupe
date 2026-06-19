@@ -6,6 +6,7 @@ import type { ConnectionMeta, QueryOutcome } from "../lib/types";
 import { ResultGrid } from "../components/ResultGrid";
 import { Confirm } from "../components/Confirm";
 import { Switch } from "../components/Switch";
+import { ExportDialog } from "../components/ExportDialog";
 import "./QueryTab.css";
 
 interface Props {
@@ -19,6 +20,8 @@ export function QueryTab({ connection }: Props) {
   const [running, setRunning] = useState(false);
   const [readOnlyToggle, setReadOnlyToggle] = useState(connection.readOnly);
   const [confirmWarnings, setConfirmWarnings] = useState<string[] | null>(null);
+  const [lastSql, setLastSql] = useState<string | null>(null);
+  const [showExport, setShowExport] = useState(false);
 
   // A prod/read-only connection forces read-only regardless of the toggle.
   const effectiveReadOnly = connection.readOnly || readOnlyToggle;
@@ -29,6 +32,7 @@ export function QueryTab({ connection }: Props) {
     try {
       const r = await api.runQuery(sql, effectiveReadOnly);
       setOutcome(r);
+      setLastSql(sql);
     } catch (e) {
       setError(String(e));
       setOutcome(null);
@@ -84,6 +88,11 @@ export function QueryTab({ connection }: Props) {
             <span className="hint">forced by connection</span>
           )}
           <div style={{ flex: 1 }} />
+          {hasColumns && lastSql && (
+            <button className="btn btn-sm" onClick={() => setShowExport(true)} disabled={running}>
+              Export
+            </button>
+          )}
           {outcome && !error && (
             <span className="status muted">
               {hasColumns
@@ -128,6 +137,13 @@ export function QueryTab({ connection }: Props) {
             void execute();
           }}
           onCancel={() => setConfirmWarnings(null)}
+        />
+      )}
+
+      {showExport && lastSql && (
+        <ExportDialog
+          source={{ kind: "query", sql: lastSql, defaultName: "query-result" }}
+          onClose={() => setShowExport(false)}
         />
       )}
     </div>

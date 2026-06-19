@@ -88,7 +88,7 @@ fn needs_text_cast(data_type: &str) -> bool {
 }
 
 /// Builds the SELECT projection, casting non-native types to text.
-fn projection(columns: &[ColumnInfo]) -> String {
+pub(crate) fn projection(columns: &[ColumnInfo]) -> String {
     columns
         .iter()
         .map(|c| {
@@ -104,10 +104,27 @@ fn projection(columns: &[ColumnInfo]) -> String {
 }
 
 /// Builds the WHERE clause from the optional user filter.
-fn where_clause(filter: &Option<String>) -> String {
+pub(crate) fn where_clause(filter: &Option<String>) -> String {
     match filter {
         Some(f) if !f.trim().is_empty() => format!(" WHERE ({})", f.trim()),
         _ => String::new(),
+    }
+}
+
+/// Builds a validated ORDER BY clause; the column must belong to the relation.
+pub(crate) fn order_clause(columns: &[ColumnInfo], sort: &Option<SortSpec>) -> AppResult<String> {
+    match sort {
+        Some(s) => {
+            if !columns.iter().any(|c| c.name == s.column) {
+                return Err(AppError::Validation(format!(
+                    "Unknown sort column: {}",
+                    s.column
+                )));
+            }
+            let dir = if s.descending { "DESC" } else { "ASC" };
+            Ok(format!(" ORDER BY {} {dir}", quote_ident(&s.column)))
+        }
+        None => Ok(String::new()),
     }
 }
 
@@ -126,21 +143,7 @@ pub async fn get_rows(
 
     let from = quote_qualified(schema, table);
     let where_sql = where_clause(&opts.filter);
-
-    // ORDER BY: the column must be a real column of this relation.
-    let order_sql = match &opts.sort {
-        Some(s) => {
-            if !columns.iter().any(|c| c.name == s.column) {
-                return Err(AppError::Validation(format!(
-                    "Unknown sort column: {}",
-                    s.column
-                )));
-            }
-            let dir = if s.descending { "DESC" } else { "ASC" };
-            format!(" ORDER BY {} {dir}", quote_ident(&s.column))
-        }
-        None => String::new(),
-    };
+    let order_sql = order_clause(&columns, &opts.sort)?;
 
     let limit = opts.limit.clamp(0, 100_000);
     let offset = opts.offset.max(0);

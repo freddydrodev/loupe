@@ -3,6 +3,7 @@
 
 use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
+use crate::export::{self, ExportOpts, ExportResult};
 use crate::introspect::{self, ColumnInfo, ConstraintInfo, IndexInfo, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
 use crate::query::{self, QueryOpts, QueryOutcome};
@@ -158,6 +159,16 @@ pub async fn get_rows(
 ) -> Result<RowsResult, String> {
     let pool = state.pool().await?;
     Ok(rows::get_rows(&pool, &schema, &table, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn export_data(
+    window: tauri::Window,
+    state: State<'_, AppState>,
+    opts: ExportOpts,
+) -> Result<ExportResult, String> {
+    let pool = state.pool().await?;
+    Ok(export::export_data(&window, &pool, &opts).await?)
 }
 
 #[tauri::command]

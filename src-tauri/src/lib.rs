@@ -7,6 +7,7 @@ mod cell;
 mod commands;
 mod db;
 mod error;
+mod export;
 mod introspect;
 mod model;
 mod query;
@@ -51,6 +52,7 @@ pub fn run() {
             commands::get_table_indexes,
             commands::get_table_constraints,
             commands::run_query,
+            commands::export_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");

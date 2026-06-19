@@ -6,6 +6,8 @@ import type {
   ColumnInfo,
   ConnectionMeta,
   ConstraintInfo,
+  ExportOpts,
+  ExportResult,
   GetRowsOpts,
   IndexInfo,
   QueryOutcome,
@@ -55,4 +57,6 @@ export const api = {
 
   runQuery: (sql: string, readOnly: boolean) =>
     invoke<QueryOutcome>("run_query", { sql, opts: { readOnly } }),
+
+  exportData: (opts: ExportOpts) => invoke<ExportResult>("export_data", { opts }),
 };
