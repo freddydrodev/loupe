@@ -1,0 +1,90 @@
+/* Lagune design tokens.
+ * Dark theme is the default; the light theme overrides the same variables
+ * under [data-theme="light"]. Type colors are shared across both themes —
+ * they encode meaning, not chrome. */
+
+:root,
+:root[data-theme="dark"] {
+  /* Surfaces */
+  --bg-base: #0c1018;
+  --surface-1: #121826;
+  --surface-2: #18202f;
+
+  /* Borders */
+  --border: #232c3d;
+  --border-hover: #2e3a4f;
+
+  /* Text */
+  --text: #e8ecf4;
+  --text-muted: #7c8699;
+  --text-faint: #515d72;
+
+  /* Semantic */
+  --accent: #7c83ff;
+  --accent-soft: rgba(124, 131, 255, 0.14);
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.14);
+  --danger: #f4717f;
+  --danger-soft: rgba(244, 113, 127, 0.14);
+
+  --shadow-elevated: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="light"] {
+  --bg-base: #f4f6fb;
+  --surface-1: #ffffff;
+  --surface-2: #eef1f7;
+
+  --border: #d8dee9;
+  --border-hover: #c2cad9;
+
+  --text: #1b2230;
+  --text-muted: #5b6678;
+  --text-faint: #8a93a6;
+
+  --accent: #5b62e6;
+  --accent-soft: rgba(91, 98, 230, 0.12);
+  --success: #0f9d63;
+  --success-soft: rgba(15, 157, 99, 0.12);
+  --danger: #d6485a;
+  --danger-soft: rgba(214, 72, 90, 0.12);
+
+  --shadow-elevated: 0 12px 32px -16px rgba(27, 34, 48, 0.22);
+}
+
+:root {
+  /* Type families — color + glyph, shared across themes. */
+  --type-int: #56a8f5;
+  --type-text: #4ade80;
+  --type-decimal: #2dd4bf;
+  --type-datetime: #fbbf24;
+  --type-bool: #c084fc;
+  --type-uuid: #f472b6;
+  --type-json: #fb923c;
+  --type-other: #7c8699;
+
+  /* Typography */
+  --font-ui: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Rhythm */
+  --radius-sm: 6px;
+  --radius: 9px;
+  --radius-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 140ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}
