@@ -3,6 +3,7 @@
 
 use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
+use crate::introspect::{self, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
 use crate::secrets;
 use sqlx::postgres::PgConnectOptions;
@@ -124,6 +125,16 @@ pub async fn current_connection(
     state: State<'_, AppState>,
 ) -> Result<Option<ConnectionMeta>, String> {
     Ok(state.active.lock().await.as_ref().map(|a| a.meta.clone()))
+}
+
+// ── Schema introspection ─────────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn list_schema_tree(
+    state: State<'_, AppState>,
+) -> Result<Vec<SchemaNode>, String> {
+    let pool = state.pool().await?;
+    Ok(introspect::schema_tree(&pool).await?)
 }
 
 /// Parses a libpq/URL connection string into editable, **secret-free** metadata.

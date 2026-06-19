@@ -2,7 +2,7 @@
 // Rust core only through these functions.
 
 import { invoke } from "@tauri-apps/api/core";
-import type { ConnectionMeta } from "./types";
+import type { ConnectionMeta, SchemaNode } from "./types";
 
 export const api = {
   appReady: () => invoke<string>("app_ready"),
@@ -28,4 +28,7 @@ export const api = {
 
   parseConnectionString: (url: string) =>
     invoke<ConnectionMeta>("parse_connection_string", { url }),
+
+  // ── Schema ───────────────────────────────────────────────────────────────
+  listSchemaTree: () => invoke<SchemaNode[]>("list_schema_tree"),
 };

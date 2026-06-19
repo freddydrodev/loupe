@@ -18,6 +18,26 @@ export interface ConnectionMeta {
   rowLimit: number;
 }
 
+export type ObjectKind = "table" | "view" | "materializedView" | "foreignTable";
+
+export interface ObjectNode {
+  name: string;
+  kind: ObjectKind;
+  estimatedRows: number | null;
+}
+
+export interface SchemaNode {
+  schema: string;
+  objects: ObjectNode[];
+}
+
+/** A selected database object the workspace operates on. */
+export interface TableRef {
+  schema: string;
+  name: string;
+  kind: ObjectKind;
+}
+
 export function blankConnection(): ConnectionMeta {
   return {
     id: "",

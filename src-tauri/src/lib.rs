@@ -6,8 +6,10 @@
 mod commands;
 mod db;
 mod error;
+mod introspect;
 mod model;
 mod secrets;
+mod sql;
 mod store;
 
 use db::AppState;
@@ -40,6 +42,7 @@ pub fn run() {
             commands::disconnect,
             commands::current_connection,
             commands::parse_connection_string,
+            commands::list_schema_tree,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");

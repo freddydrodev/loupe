@@ -1,0 +1,123 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.sidebar-search {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+.sidebar-search .input {
+  height: 30px;
+  font-size: 12px;
+}
+
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) 0 var(--space-4);
+}
+
+.sidebar-note {
+  padding: var(--space-4);
+  color: var(--text-faint);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.sidebar-note.err {
+  color: var(--danger);
+}
+
+.schema-group {
+  margin-bottom: 2px;
+}
+
+.schema-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.schema-head:hover {
+  color: var(--text);
+}
+.chevron {
+  font-size: 9px;
+  transition: transform var(--dur) var(--ease);
+  color: var(--text-faint);
+}
+.chevron.open {
+  transform: rotate(90deg);
+}
+.schema-name {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.schema-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: none;
+}
+
+.object-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.object-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: 5px var(--space-3) 5px 26px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+.object-row:hover {
+  background: var(--surface-2);
+}
+.object-row.selected {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+.obj-glyph {
+  font-size: 11px;
+  flex: none;
+  width: 14px;
+  text-align: center;
+}
+.obj-glyph.is-table {
+  color: var(--accent);
+}
+.obj-glyph.is-view {
+  color: var(--type-decimal);
+}
+.object-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.object-rows {
+  font-size: 10px;
+  color: var(--text-faint);
+  flex: none;
+}

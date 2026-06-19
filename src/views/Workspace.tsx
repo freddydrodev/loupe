@@ -1,4 +1,6 @@
-import type { ConnectionMeta } from "../lib/types";
+import { useState } from "react";
+import type { ConnectionMeta, TableRef } from "../lib/types";
+import { Sidebar } from "../components/Sidebar";
 import "./Workspace.css";
 
 interface Props {
@@ -7,11 +9,13 @@ interface Props {
 }
 
 /**
- * Workspace shell: title bar with the live connection pill, plus the
- * sidebar/main split. The sidebar tree and tabbed panes are added in later
- * phases; this establishes the frame and the disconnect path.
+ * Workspace shell: title bar with the live connection pill, sidebar tree, and
+ * the main pane. The Data/Structure/Query tabs render into the main pane in
+ * later phases; for now it reflects the current selection.
  */
 export function Workspace({ connection, onDisconnect }: Props) {
+  const [selected, setSelected] = useState<TableRef | null>(null);
+
   return (
     <div className="ws">
       <header className="ws-titlebar">
@@ -32,10 +36,19 @@ export function Workspace({ connection, onDisconnect }: Props) {
 
       <div className="ws-body">
         <aside className="ws-sidebar">
-          <div className="ws-placeholder">Schema tree — next phase</div>
+          <Sidebar selected={selected} onSelect={setSelected} />
         </aside>
         <main className="ws-main">
-          <div className="ws-placeholder">Select a table to explore its data.</div>
+          {selected ? (
+            <div className="ws-placeholder">
+              <span className="mono">
+                {selected.schema}.{selected.name}
+              </span>
+              <div style={{ marginTop: 8 }}>Data / Structure / Query tabs — next phase.</div>
+            </div>
+          ) : (
+            <div className="ws-placeholder">Select a table to explore its data.</div>
+          )}
         </main>
       </div>
     </div>
