@@ -3,6 +3,7 @@ import { api } from "../lib/api";
 import type { ConnectionMeta } from "../lib/types";
 import { ConnectionForm } from "../components/ConnectionForm";
 import { Confirm } from "../components/Confirm";
+import { ThemeToggle } from "../components/ThemeToggle";
 import "./ConnectionsView.css";
 
 interface Props {
@@ -63,15 +64,18 @@ export function ConnectionsView({ onConnected }: Props) {
           <h1>Lagune</h1>
           <p>Connect to a PostgreSQL database to begin.</p>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setEditing(null);
-            setShowForm(true);
-          }}
-        >
-          + New connection
-        </button>
+        <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
+          <ThemeToggle />
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
+            + New connection
+          </button>
+        </div>
       </header>
 
       {error && <div className="status err" style={{ marginBottom: "var(--space-4)" }}>{error}</div>}
