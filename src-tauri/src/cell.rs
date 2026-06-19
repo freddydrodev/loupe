@@ -6,7 +6,7 @@
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use serde_json::{Number, Value};
-use sqlx::{postgres::PgRow, Column, Row, TypeInfo, ValueRef};
+use sqlx::{postgres::PgRow, Row, TypeInfo, ValueRef};
 use uuid::Uuid;
 
 /// Builds a JSON number from a decimal/float string, falling back to a string
@@ -68,9 +68,4 @@ pub fn cell_to_json(row: &PgRow, i: usize) -> Result<Value, sqlx::Error> {
         },
     };
     Ok(value)
-}
-
-/// Column headers (name + declared type) in result order.
-pub fn column_headers(row: &PgRow) -> Vec<String> {
-    row.columns().iter().map(|c| c.name().to_string()).collect()
 }

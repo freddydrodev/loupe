@@ -11,7 +11,7 @@ use crate::error::AppResult;
 use crate::rows::RowColumn;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{Column, Either, PgConnection, PgPool, Row, TypeInfo};
+use sqlx::{raw_sql, Column, Either, PgConnection, PgPool, Row, TypeInfo};
 use std::time::Instant;
 
 #[derive(Debug, Default, Deserialize)]
@@ -41,7 +41,9 @@ async fn run_collect(
     let mut collected: Vec<sqlx::postgres::PgRow> = Vec::new();
     let mut affected: u64 = 0;
     {
-        let mut stream = sqlx::query(sql).fetch_many(&mut *conn);
+        // raw_sql uses the simple-query protocol: it supports multiple
+        // semicolon-separated statements and yields rows and/or command tags.
+        let mut stream = raw_sql(sql).fetch_many(&mut *conn);
         while let Some(item) = stream.try_next().await? {
             match item {
                 Either::Left(result) => affected += result.rows_affected(),

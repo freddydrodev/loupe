@@ -83,6 +83,44 @@ export interface RowsResult {
   total: number;
 }
 
+export interface ImportPreview {
+  columns: string[];
+  sampleRows: Cell[][];
+}
+
+export interface ColumnMap {
+  file: string;
+  column: string;
+}
+
+export type ImportMode = "insert" | "upsertUpdate" | "upsertIgnore";
+
+export interface ImportOpts {
+  path: string;
+  schema: string;
+  table: string;
+  mapping: ColumnMap[];
+  mode: ImportMode;
+  conflictKey: string[];
+  dryRun: boolean;
+  batchSize: number;
+  maxBytes?: number | null;
+}
+
+export interface RowError {
+  row: number;
+  message: string;
+}
+
+export interface ImportReport {
+  inserted: number;
+  updated: number;
+  skipped: number;
+  rejected: number;
+  errors: RowError[];
+  dryRun: boolean;
+}
+
 export type ExportFormat = "json" | "xlsx";
 
 export interface ExportOpts {

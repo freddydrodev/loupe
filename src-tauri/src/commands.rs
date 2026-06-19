@@ -4,6 +4,7 @@
 use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
 use crate::export::{self, ExportOpts, ExportResult};
+use crate::import::{self, ImportOpts, ImportPreview, ImportReport};
 use crate::introspect::{self, ColumnInfo, ConstraintInfo, IndexInfo, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
 use crate::query::{self, QueryOpts, QueryOutcome};
@@ -169,6 +170,26 @@ pub async fn export_data(
 ) -> Result<ExportResult, String> {
     let pool = state.pool().await?;
     Ok(export::export_data(&window, &pool, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn import_preview(path: String) -> Result<ImportPreview, String> {
+    // Preview reads the file only; no connection required.
+    Ok(import::import_preview(&path)?)
+}
+
+#[tauri::command]
+pub async fn import_data(
+    window: tauri::Window,
+    state: State<'_, AppState>,
+    opts: ImportOpts,
+) -> Result<ImportReport, String> {
+    // Importing is a write; refuse on read-only connections.
+    let (pool, meta) = state.active_meta().await?;
+    if meta.read_only && !opts.dry_run {
+        return Err("This connection is read-only. Use a dry-run, or connect without read-only.".into());
+    }
+    Ok(import::import_data(&window, &pool, &opts).await?)
 }
 
 #[tauri::command]

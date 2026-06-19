@@ -7,6 +7,7 @@ import type { ConnectionMeta, RowColumn, RowsResult, SortSpec, TableRef } from "
 import { CellValue } from "../components/CellValue";
 import { TypeBadge } from "../components/TypeBadge";
 import { ExportDialog } from "../components/ExportDialog";
+import { ImportDialog } from "../components/ImportDialog";
 import "./DataTab.css";
 
 interface Props {
@@ -25,6 +26,7 @@ export function DataTab({ connection, table }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   // Reset view state whenever the selected table changes.
   useEffect(() => {
@@ -115,6 +117,11 @@ export function DataTab({ connection, table }: Props) {
           )}
         </div>
         <div style={{ flex: 1 }} />
+        {table.kind === "table" && (
+          <button className="btn btn-sm" onClick={() => setShowImport(true)}>
+            Import
+          </button>
+        )}
         <button className="btn btn-sm" onClick={() => setShowExport(true)}>
           Export
         </button>
@@ -203,6 +210,14 @@ export function DataTab({ connection, table }: Props) {
             defaultName: table.name,
           }}
           onClose={() => setShowExport(false)}
+        />
+      )}
+
+      {showImport && (
+        <ImportDialog
+          table={table}
+          onClose={() => setShowImport(false)}
+          onImported={() => void load()}
         />
       )}
     </div>

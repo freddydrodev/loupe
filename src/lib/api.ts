@@ -9,6 +9,9 @@ import type {
   ExportOpts,
   ExportResult,
   GetRowsOpts,
+  ImportOpts,
+  ImportPreview,
+  ImportReport,
   IndexInfo,
   QueryOutcome,
   RowsResult,
@@ -59,4 +62,8 @@ export const api = {
     invoke<QueryOutcome>("run_query", { sql, opts: { readOnly } }),
 
   exportData: (opts: ExportOpts) => invoke<ExportResult>("export_data", { opts }),
+
+  importPreview: (path: string) => invoke<ImportPreview>("import_preview", { path }),
+
+  importData: (opts: ImportOpts) => invoke<ImportReport>("import_data", { opts }),
 };
