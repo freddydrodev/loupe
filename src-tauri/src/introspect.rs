@@ -187,3 +187,108 @@ pub async fn table_columns(
     }
     Ok(out)
 }
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct IndexInfo {
+    pub name: String,
+    pub columns: Vec<String>,
+    pub unique: bool,
+    pub primary: bool,
+    pub definition: String,
+}
+
+pub async fn table_indexes(
+    pool: &PgPool,
+    schema: &str,
+    table: &str,
+) -> AppResult<Vec<IndexInfo>> {
+    let rows = sqlx::query(
+        r#"
+        SELECT i.relname                                              AS name,
+               ix.indisunique                                         AS unique,
+               ix.indisprimary                                        AS primary,
+               pg_get_indexdef(ix.indexrelid)                         AS definition,
+               array_remove(array_agg(a.attname ORDER BY k.ord), NULL) AS columns
+        FROM pg_index ix
+        JOIN pg_class i ON i.oid = ix.indexrelid
+        JOIN pg_class t ON t.oid = ix.indrelid
+        JOIN pg_namespace n ON n.oid = t.relnamespace
+        JOIN unnest(ix.indkey) WITH ORDINALITY AS k(attnum, ord) ON true
+        LEFT JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum = k.attnum
+        WHERE n.nspname = $1 AND t.relname = $2
+        GROUP BY i.relname, ix.indisunique, ix.indisprimary, ix.indexrelid
+        ORDER BY ix.indisprimary DESC, ix.indisunique DESC, i.relname
+        "#,
+    )
+    .bind(schema)
+    .bind(table)
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows
+        .into_iter()
+        .map(|r| IndexInfo {
+            name: r.get("name"),
+            columns: r.try_get("columns").unwrap_or_default(),
+            unique: r.get("unique"),
+            primary: r.get("primary"),
+            definition: r.get("definition"),
+        })
+        .collect())
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConstraintInfo {
+    pub name: String,
+    /// One of: primaryKey, unique, foreignKey, check, exclusion, other.
+    pub kind: &'static str,
+    pub definition: String,
+}
+
+fn constraint_kind(contype: &str) -> &'static str {
+    match contype {
+        "p" => "primaryKey",
+        "u" => "unique",
+        "f" => "foreignKey",
+        "c" => "check",
+        "x" => "exclusion",
+        _ => "other",
+    }
+}
+
+pub async fn table_constraints(
+    pool: &PgPool,
+    schema: &str,
+    table: &str,
+) -> AppResult<Vec<ConstraintInfo>> {
+    let rows = sqlx::query(
+        r#"
+        SELECT con.conname            AS name,
+               con.contype::text      AS contype,
+               pg_get_constraintdef(con.oid) AS definition
+        FROM pg_constraint con
+        JOIN pg_class c ON c.oid = con.conrelid
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = $1 AND c.relname = $2
+        ORDER BY con.contype, con.conname
+        "#,
+    )
+    .bind(schema)
+    .bind(table)
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows
+        .into_iter()
+        .map(|r| {
+            let contype: String = r.get("contype");
+            ConstraintInfo {
+                name: r.get("name"),
+                kind: constraint_kind(&contype),
+                definition: r.get("definition"),
+            }
+        })
+        .collect())
+}

@@ -1,0 +1,116 @@
+.struct-tab {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.struct-error {
+  padding: var(--space-5);
+}
+
+.struct-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.struct-h {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.struct-empty {
+  color: var(--text-faint);
+  font-size: 13px;
+  margin: 0;
+}
+
+.struct-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  table-layout: fixed;
+}
+.struct-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+.struct-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.struct-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.struct-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--surface-2) 50%, transparent);
+}
+
+.col-name-cell {
+  font-weight: 600;
+}
+.muted {
+  color: var(--text-faint);
+}
+.not-null {
+  color: var(--text-muted);
+}
+.default-cell,
+.def-cell {
+  color: var(--text-muted);
+  max-width: 0;
+}
+
+.key-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.key-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.key-tag.pk,
+.key-tag.kind-primaryKey {
+  color: var(--type-datetime);
+  border-color: color-mix(in srgb, var(--type-datetime) 40%, transparent);
+}
+.key-tag.fk,
+.key-tag.kind-foreignKey {
+  color: var(--type-uuid);
+  border-color: color-mix(in srgb, var(--type-uuid) 40%, transparent);
+}
+.key-tag.kind-unique {
+  color: var(--type-decimal);
+  border-color: color-mix(in srgb, var(--type-decimal) 40%, transparent);
+}
+.key-tag.kind-check {
+  color: var(--type-text);
+  border-color: color-mix(in srgb, var(--type-text) 40%, transparent);
+}

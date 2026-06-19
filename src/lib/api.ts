@@ -5,7 +5,9 @@ import { invoke } from "@tauri-apps/api/core";
 import type {
   ColumnInfo,
   ConnectionMeta,
+  ConstraintInfo,
   GetRowsOpts,
+  IndexInfo,
   RowsResult,
   SchemaNode,
 } from "./types";
@@ -43,4 +45,10 @@ export const api = {
 
   getRows: (schema: string, table: string, opts: GetRowsOpts) =>
     invoke<RowsResult>("get_rows", { schema, table, opts }),
+
+  getTableIndexes: (schema: string, table: string) =>
+    invoke<IndexInfo[]>("get_table_indexes", { schema, table }),
+
+  getTableConstraints: (schema: string, table: string) =>
+    invoke<ConstraintInfo[]>("get_table_constraints", { schema, table }),
 };

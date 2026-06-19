@@ -3,7 +3,7 @@
 
 use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
-use crate::introspect::{self, ColumnInfo, SchemaNode};
+use crate::introspect::{self, ColumnInfo, ConstraintInfo, IndexInfo, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
 use crate::rows::{self, GetRowsOpts, RowsResult};
 use crate::secrets;
@@ -157,6 +157,26 @@ pub async fn get_rows(
 ) -> Result<RowsResult, String> {
     let pool = state.pool().await?;
     Ok(rows::get_rows(&pool, &schema, &table, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn get_table_indexes(
+    state: State<'_, AppState>,
+    schema: String,
+    table: String,
+) -> Result<Vec<IndexInfo>, String> {
+    let pool = state.pool().await?;
+    Ok(introspect::table_indexes(&pool, &schema, &table).await?)
+}
+
+#[tauri::command]
+pub async fn get_table_constraints(
+    state: State<'_, AppState>,
+    schema: String,
+    table: String,
+) -> Result<Vec<ConstraintInfo>, String> {
+    let pool = state.pool().await?;
+    Ok(introspect::table_constraints(&pool, &schema, &table).await?)
 }
 
 /// Parses a libpq/URL connection string into editable, **secret-free** metadata.

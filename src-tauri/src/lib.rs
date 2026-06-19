@@ -47,6 +47,8 @@ pub fn run() {
             commands::list_schema_tree,
             commands::get_table_columns,
             commands::get_rows,
+            commands::get_table_indexes,
+            commands::get_table_constraints,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");

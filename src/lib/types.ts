@@ -47,6 +47,28 @@ export interface ColumnInfo {
   fkTarget: string | null;
 }
 
+export interface IndexInfo {
+  name: string;
+  columns: string[];
+  unique: boolean;
+  primary: boolean;
+  definition: string;
+}
+
+export type ConstraintKind =
+  | "primaryKey"
+  | "unique"
+  | "foreignKey"
+  | "check"
+  | "exclusion"
+  | "other";
+
+export interface ConstraintInfo {
+  name: string;
+  kind: ConstraintKind;
+  definition: string;
+}
+
 export interface RowColumn {
   name: string;
   dataType: string;

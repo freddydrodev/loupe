@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ConnectionMeta, TableRef } from "../lib/types";
 import { DataTab } from "./DataTab";
+import { StructureTab } from "./StructureTab";
 import "./MainPane.css";
 
 type Tab = "data" | "structure" | "query";
@@ -39,8 +40,8 @@ export function MainPane({ connection, table }: Props) {
           <div className="ws-placeholder">Select a table from the sidebar.</div>
         ) : tab === "data" && table ? (
           <DataTab connection={connection} table={table} key={`${table.schema}.${table.name}`} />
-        ) : tab === "structure" ? (
-          <div className="ws-placeholder">Structure view — next phase.</div>
+        ) : tab === "structure" && table ? (
+          <StructureTab table={table} key={`${table.schema}.${table.name}`} />
         ) : (
           <div className="ws-placeholder">Query editor — coming soon.</div>
         )}
