@@ -3,8 +3,9 @@
 
 use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
-use crate::introspect::{self, SchemaNode};
+use crate::introspect::{self, ColumnInfo, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
+use crate::rows::{self, GetRowsOpts, RowsResult};
 use crate::secrets;
 use sqlx::postgres::PgConnectOptions;
 use std::str::FromStr;
@@ -135,6 +136,27 @@ pub async fn list_schema_tree(
 ) -> Result<Vec<SchemaNode>, String> {
     let pool = state.pool().await?;
     Ok(introspect::schema_tree(&pool).await?)
+}
+
+#[tauri::command]
+pub async fn get_table_columns(
+    state: State<'_, AppState>,
+    schema: String,
+    table: String,
+) -> Result<Vec<ColumnInfo>, String> {
+    let pool = state.pool().await?;
+    Ok(introspect::table_columns(&pool, &schema, &table).await?)
+}
+
+#[tauri::command]
+pub async fn get_rows(
+    state: State<'_, AppState>,
+    schema: String,
+    table: String,
+    opts: GetRowsOpts,
+) -> Result<RowsResult, String> {
+    let pool = state.pool().await?;
+    Ok(rows::get_rows(&pool, &schema, &table, &opts).await?)
 }
 
 /// Parses a libpq/URL connection string into editable, **secret-free** metadata.

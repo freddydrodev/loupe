@@ -3,11 +3,13 @@
 // The webview never receives credentials or a connection string. It talks to
 // the Rust core exclusively through the Tauri commands registered below.
 
+mod cell;
 mod commands;
 mod db;
 mod error;
 mod introspect;
 mod model;
+mod rows;
 mod secrets;
 mod sql;
 mod store;
@@ -43,6 +45,8 @@ pub fn run() {
             commands::current_connection,
             commands::parse_connection_string,
             commands::list_schema_tree,
+            commands::get_table_columns,
+            commands::get_rows,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");

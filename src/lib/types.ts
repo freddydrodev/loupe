@@ -38,6 +38,41 @@ export interface TableRef {
   kind: ObjectKind;
 }
 
+export interface ColumnInfo {
+  name: string;
+  dataType: string;
+  nullable: boolean;
+  default: string | null;
+  isPk: boolean;
+  fkTarget: string | null;
+}
+
+export interface RowColumn {
+  name: string;
+  dataType: string;
+}
+
+/** A decoded cell: JSON-compatible value. */
+export type Cell = string | number | boolean | null | Cell[] | { [k: string]: Cell };
+
+export interface RowsResult {
+  columns: RowColumn[];
+  rows: Cell[][];
+  total: number;
+}
+
+export interface SortSpec {
+  column: string;
+  descending: boolean;
+}
+
+export interface GetRowsOpts {
+  filter: string | null;
+  sort: SortSpec | null;
+  limit: number;
+  offset: number;
+}
+
 export function blankConnection(): ConnectionMeta {
   return {
     id: "",

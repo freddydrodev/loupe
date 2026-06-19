@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ConnectionMeta, TableRef } from "../lib/types";
 import { Sidebar } from "../components/Sidebar";
+import { MainPane } from "./MainPane";
 import "./Workspace.css";
 
 interface Props {
@@ -39,16 +40,7 @@ export function Workspace({ connection, onDisconnect }: Props) {
           <Sidebar selected={selected} onSelect={setSelected} />
         </aside>
         <main className="ws-main">
-          {selected ? (
-            <div className="ws-placeholder">
-              <span className="mono">
-                {selected.schema}.{selected.name}
-              </span>
-              <div style={{ marginTop: 8 }}>Data / Structure / Query tabs — next phase.</div>
-            </div>
-          ) : (
-            <div className="ws-placeholder">Select a table to explore its data.</div>
-          )}
+          <MainPane connection={connection} table={selected} />
         </main>
       </div>
     </div>

@@ -2,7 +2,13 @@
 // Rust core only through these functions.
 
 import { invoke } from "@tauri-apps/api/core";
-import type { ConnectionMeta, SchemaNode } from "./types";
+import type {
+  ColumnInfo,
+  ConnectionMeta,
+  GetRowsOpts,
+  RowsResult,
+  SchemaNode,
+} from "./types";
 
 export const api = {
   appReady: () => invoke<string>("app_ready"),
@@ -31,4 +37,10 @@ export const api = {
 
   // ── Schema ───────────────────────────────────────────────────────────────
   listSchemaTree: () => invoke<SchemaNode[]>("list_schema_tree"),
+
+  getTableColumns: (schema: string, table: string) =>
+    invoke<ColumnInfo[]>("get_table_columns", { schema, table }),
+
+  getRows: (schema: string, table: string, opts: GetRowsOpts) =>
+    invoke<RowsResult>("get_rows", { schema, table, opts }),
 };
