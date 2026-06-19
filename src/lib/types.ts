@@ -83,6 +83,13 @@ export interface RowsResult {
   total: number;
 }
 
+export interface QueryOutcome {
+  columns: RowColumn[];
+  rows: Cell[][];
+  rowsAffected: number;
+  ms: number;
+}
+
 export interface SortSpec {
   column: string;
   descending: boolean;

@@ -5,6 +5,7 @@ use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
 use crate::introspect::{self, ColumnInfo, ConstraintInfo, IndexInfo, SchemaNode};
 use crate::model::{ConnectionMeta, SslMode};
+use crate::query::{self, QueryOpts, QueryOutcome};
 use crate::rows::{self, GetRowsOpts, RowsResult};
 use crate::secrets;
 use sqlx::postgres::PgConnectOptions;
@@ -157,6 +158,18 @@ pub async fn get_rows(
 ) -> Result<RowsResult, String> {
     let pool = state.pool().await?;
     Ok(rows::get_rows(&pool, &schema, &table, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn run_query(
+    state: State<'_, AppState>,
+    sql: String,
+    opts: QueryOpts,
+) -> Result<QueryOutcome, String> {
+    let (pool, meta) = state.active_meta().await?;
+    // A read-only connection can never be overridden into a writable run.
+    let read_only = meta.read_only || opts.read_only;
+    Ok(query::run_query(&pool, &sql, read_only).await?)
 }
 
 #[tauri::command]

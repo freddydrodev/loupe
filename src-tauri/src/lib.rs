@@ -9,6 +9,7 @@ mod db;
 mod error;
 mod introspect;
 mod model;
+mod query;
 mod rows;
 mod secrets;
 mod sql;
@@ -49,6 +50,7 @@ pub fn run() {
             commands::get_rows,
             commands::get_table_indexes,
             commands::get_table_constraints,
+            commands::run_query,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");

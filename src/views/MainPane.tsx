@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ConnectionMeta, TableRef } from "../lib/types";
 import { DataTab } from "./DataTab";
 import { StructureTab } from "./StructureTab";
+import { QueryTab } from "./QueryTab";
 import "./MainPane.css";
 
 type Tab = "data" | "structure" | "query";
@@ -43,7 +44,7 @@ export function MainPane({ connection, table }: Props) {
         ) : tab === "structure" && table ? (
           <StructureTab table={table} key={`${table.schema}.${table.name}`} />
         ) : (
-          <div className="ws-placeholder">Query editor — coming soon.</div>
+          <QueryTab connection={connection} />
         )}
       </div>
     </div>

@@ -8,6 +8,7 @@ import type {
   ConstraintInfo,
   GetRowsOpts,
   IndexInfo,
+  QueryOutcome,
   RowsResult,
   SchemaNode,
 } from "./types";
@@ -51,4 +52,7 @@ export const api = {
 
   getTableConstraints: (schema: string, table: string) =>
     invoke<ConstraintInfo[]>("get_table_constraints", { schema, table }),
+
+  runQuery: (sql: string, readOnly: boolean) =>
+    invoke<QueryOutcome>("run_query", { sql, opts: { readOnly } }),
 };
