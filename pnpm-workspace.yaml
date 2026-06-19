@@ -1,2 +1,8 @@
 allowBuilds:
   esbuild: true
+
+# Force a patched esbuild (>=0.28.1) to clear GHSA-g7r4-m6w7-qqqr, a
+# low-severity dev-server-only advisory. esbuild is a build-time dependency and
+# is never shipped in the Tauri bundle.
+overrides:
+  esbuild: ">=0.28.1"

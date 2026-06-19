@@ -1,0 +1,24 @@
+# cargo-audit policy for Lagune.
+#
+# These advisories are acknowledged: every one is a transitive dependency we do
+# not control, none is critical, and none has an available fix at this time.
+# They are reviewed at each dependency bump.
+
+[advisories]
+ignore = [
+    # rsa 0.9 — "Marvin Attack" timing side-channel (medium, 5.9). Pulled in
+    # transitively by sqlx-postgres. No fixed upgrade exists upstream. Lagune
+    # connects to Postgres over rustls TLS; this is tracked for the next sqlx
+    # release that drops or patches the rsa dependency.
+    "RUSTSEC-2023-0071",
+
+    # The following are *unmaintained* / *unsound* warnings (not vulnerabilities)
+    # coming from Tauri's Linux GTK3 binding stack and the unic-* unicode crates,
+    # all transitive. They do not affect macOS/Windows builds and have no fix.
+    "RUSTSEC-2024-0429", # glib VariantStrIter unsoundness (GTK3, Linux)
+    "RUSTSEC-2024-0413", # atk gtk-rs GTK3 bindings unmaintained
+    "RUSTSEC-2025-0075", # unic-char-range unmaintained
+    "RUSTSEC-2025-0080", # unic-common unmaintained
+    "RUSTSEC-2025-0098", # unic-ucd-version unmaintained
+    "RUSTSEC-2025-0100", # unic-ucd-ident unmaintained
+]

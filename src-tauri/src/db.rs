@@ -132,3 +132,47 @@ fn map_connect_error(e: sqlx::Error) -> AppError {
         AppError::Db(msg)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::model::SslMode;
+
+    fn meta(ssl: SslMode, cert: Option<&str>) -> ConnectionMeta {
+        ConnectionMeta {
+            id: String::new(),
+            label: "t".into(),
+            host: "localhost".into(),
+            port: 5432,
+            database: "db".into(),
+            username: "u".into(),
+            ssl_mode: ssl,
+            root_cert_path: cert.map(String::from),
+            read_only: false,
+            is_prod: false,
+            statement_timeout_ms: 30_000,
+            row_limit: 1_000,
+        }
+    }
+
+    #[test]
+    fn require_mode_builds() {
+        assert!(build_options(&meta(SslMode::Require, None), "pw".into()).is_ok());
+    }
+
+    #[test]
+    fn verify_full_requires_cert() {
+        // verify-full with no certificate is a TLS policy error, not a silent
+        // downgrade.
+        let err = build_options(&meta(SslMode::VerifyFull, None), "pw".into()).unwrap_err();
+        assert!(matches!(err, AppError::Tls(_)));
+    }
+
+    #[test]
+    fn empty_host_rejected() {
+        let mut m = meta(SslMode::Require, None);
+        m.host = "  ".into();
+        let err = build_options(&m, "pw".into()).unwrap_err();
+        assert!(matches!(err, AppError::Validation(_)));
+    }
+}

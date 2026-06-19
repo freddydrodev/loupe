@@ -523,3 +523,38 @@ fn push_error(report: &mut ImportReport, row: i64, message: String) {
         report.errors.push(RowError { row, message });
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn scalars_bind_as_text() {
+        assert_eq!(value_to_bind(&json!(42), "integer").unwrap(), Some("42".into()));
+        assert_eq!(value_to_bind(&json!(true), "boolean").unwrap(), Some("true".into()));
+        assert_eq!(value_to_bind(&Value::Null, "text").unwrap(), None);
+        assert_eq!(value_to_bind(&json!("hi"), "text").unwrap(), Some("hi".into()));
+    }
+
+    #[test]
+    fn json_array_becomes_pg_literal() {
+        let v = json!(["a", "b,c", 1]);
+        assert_eq!(
+            value_to_bind(&v, "text[]").unwrap(),
+            Some("{\"a\",\"b,c\",1}".into())
+        );
+    }
+
+    #[test]
+    fn object_into_jsonb_is_text() {
+        let v = json!({"k": 1});
+        let bound = value_to_bind(&v, "jsonb").unwrap().unwrap();
+        assert!(bound.contains("\"k\""));
+    }
+
+    #[test]
+    fn array_into_scalar_column_is_rejected() {
+        assert!(value_to_bind(&json!([1, 2]), "integer").is_err());
+    }
+}
