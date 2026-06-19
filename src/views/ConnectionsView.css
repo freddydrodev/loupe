@@ -1,0 +1,89 @@
+.conn-view {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-6) clamp(var(--space-5), 8vw, 96px);
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.conn-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.conn-header h1 {
+  font-size: 30px;
+  letter-spacing: -0.02em;
+}
+.conn-header p {
+  margin: var(--space-2) 0 0;
+  color: var(--text-muted);
+}
+
+.conn-empty {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--text-muted);
+}
+.conn-empty p {
+  margin: 0 0 var(--space-2);
+}
+
+.conn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-4);
+}
+
+.conn-card {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.conn-card:hover {
+  border-color: var(--border-hover);
+}
+
+.conn-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.conn-card-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.conn-label {
+  font-weight: 600;
+  font-size: 15px;
+}
+.conn-dsn {
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conn-tags {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+.conn-card-meta {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.conn-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

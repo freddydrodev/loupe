@@ -3,6 +3,17 @@
 // The webview never receives credentials or a connection string. It talks to
 // the Rust core exclusively through the Tauri commands registered below.
 
+mod commands;
+mod db;
+mod error;
+mod model;
+mod secrets;
+mod store;
+
+use db::AppState;
+use store::ConnectionStore;
+use tauri::Manager;
+
 /// Liveness probe used by the frontend to confirm the Rust core is reachable.
 #[tauri::command]
 fn app_ready() -> &'static str {
@@ -13,7 +24,23 @@ fn app_ready() -> &'static str {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![app_ready])
+        .setup(|app| {
+            let dir = app.path().app_config_dir()?;
+            let store = ConnectionStore::load(dir.join("connections.json"))?;
+            app.manage(AppState::new(store));
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            app_ready,
+            commands::list_connections,
+            commands::save_connection,
+            commands::delete_connection,
+            commands::test_connection,
+            commands::connect,
+            commands::disconnect,
+            commands::current_connection,
+            commands::parse_connection_string,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Lagune");
 }

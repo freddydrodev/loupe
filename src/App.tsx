@@ -1,56 +1,39 @@
 import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { api } from "./lib/api";
+import type { ConnectionMeta } from "./lib/types";
+import { ConnectionsView } from "./views/ConnectionsView";
+import { Workspace } from "./views/Workspace";
 
-/**
- * Phase 1 shell. The connection manager, sidebar, and tabbed workspace are
- * layered on in later phases; for now this confirms the Rust core is reachable
- * and establishes the app frame.
- */
 function App() {
-  const [coreReady, setCoreReady] = useState<boolean | null>(null);
+  const [active, setActive] = useState<ConnectionMeta | null>(null);
+  const [restoring, setRestoring] = useState(true);
 
+  // Restore an already-open connection (survives a dev HMR reload).
   useEffect(() => {
-    invoke<string>("app_ready")
-      .then((id) => setCoreReady(id === "lagune"))
-      .catch(() => setCoreReady(false));
+    api
+      .currentConnection()
+      .then(setActive)
+      .catch(() => setActive(null))
+      .finally(() => setRestoring(false));
   }, []);
 
-  return (
-    <main
-      style={{
-        flex: 1,
-        display: "grid",
-        placeItems: "center",
-        textAlign: "center",
-        gap: "var(--space-4)",
-      }}
-    >
-      <div style={{ display: "grid", gap: "var(--space-2)" }}>
-        <h1 style={{ fontSize: 34, letterSpacing: "-0.02em" }}>Lagune</h1>
-        <p style={{ color: "var(--text-muted)", margin: 0 }}>
-          A modern desktop client for PostgreSQL
-        </p>
-        <p
-          className="mono"
-          style={{
-            marginTop: "var(--space-3)",
-            fontSize: 12,
-            color:
-              coreReady === null
-                ? "var(--text-faint)"
-                : coreReady
-                  ? "var(--success)"
-                  : "var(--danger)",
-          }}
-        >
-          {coreReady === null
-            ? "connecting to core…"
-            : coreReady
-              ? "● core ready"
-              : "○ core unreachable"}
-        </p>
-      </div>
-    </main>
+  async function disconnect() {
+    await api.disconnect().catch(() => {});
+    setActive(null);
+  }
+
+  if (restoring) {
+    return (
+      <main style={{ flex: 1, display: "grid", placeItems: "center" }}>
+        <span className="status muted">starting…</span>
+      </main>
+    );
+  }
+
+  return active ? (
+    <Workspace connection={active} onDisconnect={disconnect} />
+  ) : (
+    <ConnectionsView onConnected={setActive} />
   );
 }
 

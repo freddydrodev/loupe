@@ -1,0 +1,60 @@
+.ws {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ws-titlebar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 46px;
+  padding: 0 var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
+  flex: none;
+}
+.ws-brand {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.ws-conn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ws-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.ws-sidebar {
+  width: 280px;
+  flex: none;
+  border-right: 1px solid var(--border);
+  background: var(--surface-1);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ws-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ws-placeholder {
+  margin: auto;
+  color: var(--text-faint);
+  font-size: 13px;
+  padding: var(--space-5);
+  text-align: center;
+}
