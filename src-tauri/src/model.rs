@@ -5,7 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 
-/// TLS policy for a connection. Lagune never offers a non-TLS mode: the weakest
+/// TLS policy for a connection. Loupe never offers a non-TLS mode: the weakest
 /// option is `require`, and `verify-full` additionally checks the server cert.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,6 +40,10 @@ pub struct ConnectionMeta {
     pub port: u16,
     pub database: String,
     pub username: String,
+    /// Optional color tag (hex string) used to distinguish connections at a
+    /// glance — purely cosmetic, mirrors MongoDB Compass connection colors.
+    #[serde(default)]
+    pub color: Option<String>,
     #[serde(default)]
     pub ssl_mode: SslMode,
     /// Path to a root CA certificate, used only with `verify-full`.

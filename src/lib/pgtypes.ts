@@ -1,4 +1,4 @@
-// Maps a Postgres type name to a color family + glyph. This is Lagune's
+// Maps a Postgres type name to a color family + glyph. This is Loupe's
 // signature: every type is identifiable by color in the data grid and the
 // structure view. Unknown types fall back to the neutral "other" family.
 

@@ -14,13 +14,34 @@
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
+.conn-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+/* The optical mark — a lens iris that catches the light, echoing the workspace
+ * brand mark at a larger scale. */
+.conn-brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex: none;
+  background:
+    radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--accent) 55%, white 45%), var(--accent) 58%);
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--accent) 14%, transparent),
+    0 8px 24px -8px color-mix(in srgb, var(--accent) 60%, transparent),
+    inset 0 0 0 7px color-mix(in srgb, var(--bg-base) 78%, transparent);
+}
 .conn-header h1 {
-  font-size: 30px;
-  letter-spacing: -0.02em;
+  font-size: 38px;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
 }
 .conn-header p {
   margin: var(--space-2) 0 0;
   color: var(--text-muted);
+  font-size: 14px;
 }
 
 .conn-empty {
@@ -40,14 +61,75 @@
   gap: var(--space-4);
 }
 
+/* Staggered entrance — cards rise in sequence on load. */
+.conn-grid .conn-card {
+  animation: conn-card-in 360ms var(--ease) both;
+}
+.conn-grid .conn-card:nth-child(1) { animation-delay: 0ms; }
+.conn-grid .conn-card:nth-child(2) { animation-delay: 45ms; }
+.conn-grid .conn-card:nth-child(3) { animation-delay: 90ms; }
+.conn-grid .conn-card:nth-child(4) { animation-delay: 135ms; }
+.conn-grid .conn-card:nth-child(5) { animation-delay: 180ms; }
+.conn-grid .conn-card:nth-child(6) { animation-delay: 225ms; }
+.conn-grid .conn-card:nth-child(n + 7) { animation-delay: 270ms; }
+
+@keyframes conn-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .conn-grid .conn-card {
+    animation: none;
+  }
+}
+
 .conn-card {
+  position: relative;
   padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  overflow: hidden;
+  box-shadow: var(--edge-light);
+  transition:
+    border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 .conn-card:hover {
   border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft), var(--edge-light);
+}
+.conn-card .conn-label {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+/* Colored connections get a left accent rail + a faint corner wash. */
+.conn-card[data-colored] {
+  border-left: 3px solid var(--conn-color);
+  background:
+    radial-gradient(
+      90% 60% at 0% 0%,
+      color-mix(in srgb, var(--conn-color) 8%, transparent),
+      transparent 55%
+    ),
+    var(--surface-1);
+}
+
+.conn-dot {
+  display: none;
+}
+.conn-card[data-colored] .conn-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--conn-color);
+  margin-right: 8px;
+  vertical-align: 1px;
 }
 
 .conn-card-top {

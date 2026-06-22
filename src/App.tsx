@@ -22,6 +22,14 @@ function App() {
     setActive(null);
   }
 
+  // Switch to another saved connection in place. The Rust `connect` command
+  // closes the previous pool and swaps the active one, so we only flip state
+  // once the new pool is live — a failed switch leaves the current session intact.
+  async function switchConnection(meta: ConnectionMeta) {
+    await api.connect(meta.id);
+    setActive(meta);
+  }
+
   if (restoring) {
     return (
       <main style={{ flex: 1, display: "grid", placeItems: "center" }}>
@@ -31,7 +39,11 @@ function App() {
   }
 
   return active ? (
-    <Workspace connection={active} onDisconnect={disconnect} />
+    <Workspace
+      connection={active}
+      onDisconnect={disconnect}
+      onSwitch={switchConnection}
+    />
   ) : (
     <ConnectionsView onConnected={setActive} />
   );

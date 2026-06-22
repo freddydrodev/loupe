@@ -1,22 +1,23 @@
-/* Lagune design tokens.
+/* Loupe design tokens.
  * Dark theme is the default; the light theme overrides the same variables
  * under [data-theme="light"]. Type colors are shared across both themes —
  * they encode meaning, not chrome. */
 
 :root,
 :root[data-theme="dark"] {
-  /* Surfaces */
-  --bg-base: #0c1018;
-  --surface-1: #121826;
+  /* Surfaces — a deep, cool slate with a hint of indigo for depth. */
+  --bg-base: #0a0e16;
+  --surface-1: #111726;
   --surface-2: #18202f;
+  --surface-3: #1f2839;
 
   /* Borders */
   --border: #232c3d;
-  --border-hover: #2e3a4f;
+  --border-hover: #313d52;
 
   /* Text */
-  --text: #e8ecf4;
-  --text-muted: #7c8699;
+  --text: #eaeef6;
+  --text-muted: #828da0;
   --text-faint: #515d72;
 
   /* Semantic */
@@ -27,18 +28,23 @@
   --danger: #f4717f;
   --danger-soft: rgba(244, 113, 127, 0.14);
 
-  --shadow-elevated: 0 12px 32px -12px rgba(0, 0, 0, 0.6);
+  /* Elevation */
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px -6px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 18px 48px -16px rgba(0, 0, 0, 0.7);
+  /* Faint top-edge highlight that reads as light catching an edge. */
+  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 :root[data-theme="light"] {
-  --bg-base: #f4f6fb;
+  --bg-base: #f3f5fa;
   --surface-1: #ffffff;
   --surface-2: #eef1f7;
+  --surface-3: #e6eaf3;
 
-  --border: #d8dee9;
+  --border: #dce1ec;
   --border-hover: #c2cad9;
 
-  --text: #1b2230;
+  --text: #161c28;
   --text-muted: #5b6678;
   --text-faint: #8a93a6;
 
@@ -49,7 +55,9 @@
   --danger: #d6485a;
   --danger-soft: rgba(214, 72, 90, 0.12);
 
-  --shadow-elevated: 0 12px 32px -16px rgba(27, 34, 48, 0.22);
+  --shadow-soft: 0 1px 2px rgba(27, 34, 48, 0.05), 0 4px 12px -6px rgba(27, 34, 48, 0.1);
+  --shadow-elevated: 0 18px 48px -20px rgba(27, 34, 48, 0.28);
+  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 :root {
@@ -63,8 +71,11 @@
   --type-json: #fb923c;
   --type-other: #7c8699;
 
-  /* Typography */
-  --font-ui: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  /* Typography — Bricolage Grotesque gives Loupe its optical, instrument-like
+   * wordmark; Hanken Grotesk carries the UI with warmth at small sizes; mono
+   * stays JetBrains for tabular data legibility. */
+  --font-display: "Bricolage Grotesque", "Hanken Grotesk", system-ui, sans-serif;
+  --font-ui: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Rhythm */

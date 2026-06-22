@@ -244,6 +244,7 @@ pub async fn parse_connection_string(url: String) -> Result<ConnectionMeta, Stri
         port: opts.get_port(),
         database,
         username: opts.get_username().to_string(),
+        color: None,
         ssl_mode: SslMode::Require,
         root_cert_path: None,
         read_only: false,

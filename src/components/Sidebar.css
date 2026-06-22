@@ -5,14 +5,68 @@
   height: 100%;
 }
 
+.sidebar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-3) 0;
+  flex: none;
+}
+.sidebar-head-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+.sidebar-head-count {
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
 .sidebar-search {
-  padding: var(--space-3);
+  position: relative;
+  padding: var(--space-2) var(--space-3) var(--space-3);
   border-bottom: 1px solid var(--border);
   flex: none;
 }
 .sidebar-search .input {
-  height: 30px;
+  height: 32px;
   font-size: 12px;
+  padding-left: 28px;
+  padding-right: 26px;
+}
+.sidebar-search .input:focus {
+  border-color: var(--conn, var(--accent));
+}
+.sidebar-search-icon {
+  position: absolute;
+  left: calc(var(--space-3) + 9px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+.sidebar-search-clear {
+  position: absolute;
+  right: calc(var(--space-3) + 6px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 9px;
+  line-height: 1;
+}
+.sidebar-search-clear:hover {
+  color: var(--text);
+  background: var(--border-hover);
 }
 
 .sidebar-scroll {
@@ -95,8 +149,12 @@
   background: var(--surface-2);
 }
 .object-row.selected {
-  background: var(--accent-soft);
-  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--conn, var(--accent)) 14%, transparent);
+  border-left-color: var(--conn, var(--accent));
+  color: var(--text);
+}
+.object-row.selected .object-name {
+  font-weight: 600;
 }
 .obj-glyph {
   font-size: 11px;
@@ -105,7 +163,7 @@
   text-align: center;
 }
 .obj-glyph.is-table {
-  color: var(--accent);
+  color: var(--conn, var(--accent));
 }
 .obj-glyph.is-view {
   color: var(--type-decimal);

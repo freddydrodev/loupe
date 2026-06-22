@@ -10,6 +10,8 @@ export interface ConnectionMeta {
   port: number;
   database: string;
   username: string;
+  /** Optional hex color tag for visual identification. null = neutral. */
+  color: string | null;
   sslMode: SslMode;
   rootCertPath: string | null;
   readOnly: boolean;
@@ -75,7 +77,13 @@ export interface RowColumn {
 }
 
 /** A decoded cell: JSON-compatible value. */
-export type Cell = string | number | boolean | null | Cell[] | { [k: string]: Cell };
+export type Cell =
+  | string
+  | number
+  | boolean
+  | null
+  | Cell[]
+  | { [k: string]: Cell };
 
 export interface RowsResult {
   columns: RowColumn[];
@@ -158,6 +166,20 @@ export interface GetRowsOpts {
   offset: number;
 }
 
+/** Connection color tags — reused from the shared type-color palette so the
+ * connection swatches stay cohesive with the rest of Loupe. */
+export const CONNECTION_COLORS: { name: string; value: string }[] = [
+  { name: "Periwinkle", value: "#7c83ff" },
+  { name: "Blue", value: "#56a8f5" },
+  { name: "Teal", value: "#2dd4bf" },
+  { name: "Emerald", value: "#34d399" },
+  { name: "Amber", value: "#fbbf24" },
+  { name: "Orange", value: "#fb923c" },
+  { name: "Rose", value: "#f4717f" },
+  { name: "Pink", value: "#f472b6" },
+  { name: "Violet", value: "#c084fc" },
+];
+
 export function blankConnection(): ConnectionMeta {
   return {
     id: "",
@@ -166,6 +188,7 @@ export function blankConnection(): ConnectionMeta {
     port: 5432,
     database: "",
     username: "",
+    color: null,
     sslMode: "require",
     rootCertPath: null,
     readOnly: false,

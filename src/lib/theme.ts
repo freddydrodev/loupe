@@ -3,7 +3,7 @@
 
 export type Theme = "dark" | "light";
 
-const KEY = "lagune-theme";
+const KEY = "Loupe-theme";
 
 export function getStoredTheme(): Theme {
   return localStorage.getItem(KEY) === "light" ? "light" : "dark";

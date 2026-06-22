@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { getStoredTheme, setTheme, type Theme } from "../lib/theme";
 
-/** Switches between the dark and light Lagune themes. */
+/** Switches between the dark and light Loupe themes. */
 export function ThemeToggle() {
   const [theme, setLocal] = useState<Theme>(getStoredTheme());
 

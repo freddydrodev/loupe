@@ -1,4 +1,4 @@
-# Lagune
+# Loupe
 
 A modern desktop PostgreSQL client, built for Neon-first workflows. Explore
 schemas, browse and filter data, run SQL, and import/export JSON & XLSX — with

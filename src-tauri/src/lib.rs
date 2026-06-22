@@ -1,4 +1,4 @@
-// Lagune — desktop PostgreSQL client.
+// Loupe — desktop PostgreSQL client.
 //
 // The webview never receives credentials or a connection string. It talks to
 // the Rust core exclusively through the Tauri commands registered below.
@@ -24,7 +24,7 @@ use tauri::Manager;
 /// Liveness probe used by the frontend to confirm the Rust core is reachable.
 #[tauri::command]
 fn app_ready() -> &'static str {
-    "lagune"
+    "Loupe"
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -58,5 +58,5 @@ pub fn run() {
             commands::import_data,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Lagune");
+        .expect("error while running Loupe");
 }

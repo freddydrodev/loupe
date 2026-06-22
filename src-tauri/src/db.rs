@@ -76,7 +76,7 @@ pub fn build_options(meta: &ConnectionMeta, mut password: String) -> AppResult<P
         .username(&meta.username)
         .password(&password)
         .ssl_mode(ssl)
-        .application_name("Lagune");
+        .application_name("Loupe");
 
     if meta.ssl_mode == SslMode::VerifyFull {
         match &meta.root_cert_path {
@@ -91,14 +91,11 @@ pub fn build_options(meta: &ConnectionMeta, mut password: String) -> AppResult<P
         }
     }
 
-    // Session GUCs applied at startup via the libpq `options` parameter.
-    let timeout = meta.statement_timeout_ms.to_string();
-    let mut guc: Vec<(&str, &str)> = vec![("statement_timeout", timeout.as_str())];
-    if meta.read_only {
-        guc.push(("default_transaction_read_only", "on"));
-    }
-    opts = opts.options(guc);
-
+    // Session GUCs are deliberately NOT set via the libpq `options` startup
+    // parameter: pooled endpoints (e.g. Neon's `-pooler` host) reject startup
+    // parameters like `statement_timeout`. They are instead applied per
+    // connection in `open_pool` via `SET`, which works on pooled and direct
+    // endpoints alike.
     password.zeroize();
     Ok(opts)
 }
@@ -106,9 +103,27 @@ pub fn build_options(meta: &ConnectionMeta, mut password: String) -> AppResult<P
 /// Opens a pool and verifies it with `SELECT 1`.
 pub async fn open_pool(meta: &ConnectionMeta, password: String) -> AppResult<PgPool> {
     let opts = build_options(meta, password)?;
+    let statement_timeout_ms = meta.statement_timeout_ms;
+    let read_only = meta.read_only;
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .acquire_timeout(Duration::from_secs(15))
+        .after_connect(move |conn, _meta| {
+            // Apply session GUCs here rather than as libpq startup `options`,
+            // which pooled endpoints (Neon `-pooler`) reject. statement_timeout
+            // takes a value in milliseconds.
+            Box::pin(async move {
+                sqlx::query(&format!("SET statement_timeout = {statement_timeout_ms}"))
+                    .execute(&mut *conn)
+                    .await?;
+                if read_only {
+                    sqlx::query("SET default_transaction_read_only = on")
+                        .execute(&mut *conn)
+                        .await?;
+                }
+                Ok(())
+            })
+        })
         .connect_with(opts)
         .await
         .map_err(map_connect_error)?;
@@ -126,7 +141,7 @@ fn map_connect_error(e: sqlx::Error) -> AppError {
         || lower.contains("server does not support")
     {
         AppError::Tls(format!(
-            "TLS negotiation failed — the server may not support SSL, which Lagune requires. ({msg})"
+            "TLS negotiation failed — the server may not support SSL, which Loupe requires. ({msg})"
         ))
     } else {
         AppError::Db(msg)
@@ -146,6 +161,7 @@ mod tests {
             port: 5432,
             database: "db".into(),
             username: "u".into(),
+            color: None,
             ssl_mode: ssl,
             root_cert_path: cert.map(String::from),
             read_only: false,

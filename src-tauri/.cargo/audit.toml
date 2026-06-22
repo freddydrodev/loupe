@@ -1,4 +1,4 @@
-# cargo-audit policy for Lagune.
+# cargo-audit policy for Loupe.
 #
 # These advisories are acknowledged: every one is a transitive dependency we do
 # not control, none is critical, and none has an available fix at this time.
@@ -7,7 +7,7 @@
 [advisories]
 ignore = [
     # rsa 0.9 — "Marvin Attack" timing side-channel (medium, 5.9). Pulled in
-    # transitively by sqlx-postgres. No fixed upgrade exists upstream. Lagune
+    # transitively by sqlx-postgres. No fixed upgrade exists upstream. Loupe
     # connects to Postgres over rustls TLS; this is tracked for the next sqlx
     # release that drops or patches the rsa dependency.
     "RUSTSEC-2023-0071",

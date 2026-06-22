@@ -17,7 +17,20 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: var(--text);
-  background: var(--bg-base);
+  /* Faint, layered light source so empty chrome has depth rather than a flat
+   * fill — like light pooling through a lens. */
+  background:
+    radial-gradient(
+      130% 90% at 100% -10%,
+      color-mix(in srgb, var(--accent) 7%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      100% 80% at -10% 110%,
+      color-mix(in srgb, var(--accent) 4%, transparent),
+      transparent 50%
+    ),
+    var(--bg-base);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* The webview is a desktop chrome, not a scrolling document. */
@@ -35,8 +48,9 @@ h2,
 h3,
 h4 {
   margin: 0;
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 a {
@@ -52,6 +66,9 @@ button {
 code,
 .mono {
   font-family: var(--font-mono);
+  /* Tabular figures + slashed zero — numbers align in columns and 0 never
+   * reads as O, which matters for ids, counts and data cells. */
+  font-feature-settings: "tnum" 1, "zero" 1;
 }
 
 /* Visible keyboard focus everywhere; never remove the ring without replacing it. */

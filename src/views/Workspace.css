@@ -3,29 +3,94 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* --conn is set inline per connection; fall back to the brand accent. */
+  --conn: var(--accent);
 }
 
+/* ── Titlebar ──────────────────────────────────────────────────────────── */
 .ws-titlebar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  height: 46px;
+  height: 52px;
   padding: 0 var(--space-4);
   border-bottom: 1px solid var(--border);
-  background: var(--surface-1);
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--conn) 8%, var(--surface-1)),
+      var(--surface-1) 320px
+    );
   flex: none;
 }
-.ws-brand {
-  font-weight: 700;
-  letter-spacing: -0.01em;
+/* A hairline of the connection's color runs the full width of the chrome. */
+.ws-titlebar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    var(--conn),
+    color-mix(in srgb, var(--conn) 35%, transparent) 45%,
+    transparent 70%
+  );
 }
-.ws-conn {
+
+.ws-brand {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 17px;
+}
+.ws-brand-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex: none;
+  background:
+    radial-gradient(
+      circle at 32% 32%,
+      color-mix(in srgb, var(--conn) 70%, white 30%),
+      var(--conn) 60%
+    );
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--conn) 18%, transparent),
+    inset 0 0 0 3px color-mix(in srgb, var(--bg-base) 80%, transparent);
 }
 
+.ws-titlebar-sep {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex: none;
+}
+
+/* Prod connections get a louder, warmer signal in the chrome. */
+.ws[data-prod] .ws-titlebar {
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--danger) 12%, var(--surface-1)),
+    var(--surface-1) 360px
+  );
+}
+.ws[data-prod] .ws-titlebar::after {
+  background: linear-gradient(
+    to right,
+    var(--danger),
+    color-mix(in srgb, var(--danger) 40%, transparent) 50%,
+    transparent 75%
+  );
+  height: 3px;
+}
+
+/* ── Body ──────────────────────────────────────────────────────────────── */
 .ws-body {
   flex: 1;
   display: flex;
@@ -49,6 +114,14 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  position: relative;
+  background:
+    radial-gradient(
+      120% 80% at 100% 0%,
+      color-mix(in srgb, var(--conn) 5%, transparent),
+      transparent 60%
+    ),
+    var(--bg-base);
 }
 
 .ws-placeholder {

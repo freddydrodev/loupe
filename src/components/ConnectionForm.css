@@ -1,0 +1,280 @@
+/* Connection form — MongoDB Compass-inspired.
+ *
+ * Name + color live in a persistent identity band above a two-tab body
+ * (Connection String, prioritized · Advanced). The chosen connection color
+ * flows through `--conn-accent`, tinting the active tab, focus rings and the
+ * primary action so picking a color is felt immediately. */
+
+.cf-modal {
+  width: min(600px, 100%);
+  /* A whisper of the chosen color in the top edge — atmosphere, not chrome. */
+  background:
+    radial-gradient(
+      120% 80% at 0% 0%,
+      color-mix(in srgb, var(--conn-accent) 9%, transparent),
+      transparent 60%
+    ),
+    var(--surface-1);
+}
+
+/* ── Identity band ─────────────────────────────────────────────────────── */
+.cf-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.cf-swatch-wrap {
+  position: relative;
+  flex: none;
+}
+.cf-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--conn-accent) 50%, transparent);
+  transition:
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+.cf-swatch:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+.cf-swatch:active {
+  transform: translateY(0);
+}
+.cf-swatch-empty {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--text-faint);
+}
+
+.cf-swatch-pop {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  width: 184px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-elevated);
+  animation: cf-pop var(--dur) var(--ease);
+}
+@keyframes cf-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+.cf-chip {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform var(--dur) var(--ease);
+}
+.cf-chip:hover {
+  transform: scale(1.12);
+}
+.cf-chip.is-on {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--surface-2);
+}
+.cf-chip-none {
+  background: var(--bg-base);
+  display: grid;
+  place-items: center;
+}
+.cf-chip-none::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 1.5px;
+  background: var(--danger);
+  transform: rotate(-45deg);
+}
+
+.cf-name {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--space-3);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.cf-name::placeholder {
+  color: var(--text-faint);
+  font-weight: 500;
+}
+.cf-name:hover {
+  background: var(--surface-2);
+}
+.cf-name:focus {
+  outline: none;
+  background: var(--bg-base);
+  border-color: var(--conn-accent);
+}
+.cf-close {
+  flex: none;
+}
+
+/* ── Segmented tabs ────────────────────────────────────────────────────── */
+.cf-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  margin: var(--space-4) var(--space-5) 0;
+  padding: var(--space-1);
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.cf-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur) var(--ease);
+}
+.cf-tab:hover {
+  color: var(--text);
+}
+.cf-tab.is-active {
+  color: var(--text);
+}
+.cf-tab-glyph {
+  font-size: 14px;
+  opacity: 0.85;
+}
+/* Sliding indicator behind the active tab. */
+.cf-tab-rail {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  width: calc(50% - var(--space-1) - 1px);
+  height: calc(100% - var(--space-1) * 2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--conn-accent) 16%, var(--surface-2));
+  border: 1px solid color-mix(in srgb, var(--conn-accent) 45%, transparent);
+  transition: transform 220ms var(--ease);
+}
+.cf-tab-rail.right {
+  transform: translateX(calc(100% + var(--space-1)));
+}
+
+/* ── Body ──────────────────────────────────────────────────────────────── */
+.cf-body {
+  gap: var(--space-4);
+}
+
+.cf-uri-pane {
+  display: grid;
+  gap: var(--space-3);
+  animation: cf-fade var(--dur) var(--ease);
+}
+.cf-uri-input {
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+.cf-uri-input:focus {
+  border-color: var(--conn-accent);
+}
+.cf-fields-link {
+  justify-self: start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--conn-accent);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity var(--dur) var(--ease);
+}
+.cf-fields-link:hover {
+  opacity: 1;
+}
+
+.cf-adv-pane {
+  display: grid;
+  gap: var(--space-4);
+  animation: cf-fade var(--dur) var(--ease);
+}
+@keyframes cf-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.cf-row {
+  display: grid;
+  gap: var(--space-3);
+}
+.cf-row-2 {
+  grid-template-columns: 1fr 1fr;
+}
+.cf-row-2-1 {
+  grid-template-columns: 1fr 96px;
+}
+.cf-guards {
+  align-items: center;
+}
+.cf-cert-row {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Inputs in the advanced pane pick up the connection color on focus. */
+.cf-adv-pane .input:focus,
+.cf-adv-pane .select:focus {
+  border-color: var(--conn-accent);
+}
+
+/* ── Primary action, tinted by the connection color ────────────────────── */
+.cf-save {
+  background: var(--conn-accent);
+  border-color: transparent;
+  color: #0b0f18;
+  font-weight: 600;
+}
+.cf-save:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--conn-accent) 88%, white 12%);
+}

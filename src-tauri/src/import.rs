@@ -482,22 +482,22 @@ pub async fn import_data(
             }
 
             // Per-row savepoint so a bad row does not abort the whole batch.
-            sqlx::query("SAVEPOINT lagune_row").execute(&mut *tx).await?;
+            sqlx::query("SAVEPOINT Loupe_row").execute(&mut *tx).await?;
             match insert_one(&mut tx, &plan, &binds).await {
                 Ok(RowOutcome::Inserted) => {
-                    sqlx::query("RELEASE SAVEPOINT lagune_row").execute(&mut *tx).await?;
+                    sqlx::query("RELEASE SAVEPOINT Loupe_row").execute(&mut *tx).await?;
                     report.inserted += 1;
                 }
                 Ok(RowOutcome::Updated) => {
-                    sqlx::query("RELEASE SAVEPOINT lagune_row").execute(&mut *tx).await?;
+                    sqlx::query("RELEASE SAVEPOINT Loupe_row").execute(&mut *tx).await?;
                     report.updated += 1;
                 }
                 Ok(RowOutcome::Skipped) => {
-                    sqlx::query("RELEASE SAVEPOINT lagune_row").execute(&mut *tx).await?;
+                    sqlx::query("RELEASE SAVEPOINT Loupe_row").execute(&mut *tx).await?;
                     report.skipped += 1;
                 }
                 Err(e) => {
-                    sqlx::query("ROLLBACK TO SAVEPOINT lagune_row")
+                    sqlx::query("ROLLBACK TO SAVEPOINT Loupe_row")
                         .execute(&mut *tx)
                         .await?;
                     report.rejected += 1;

@@ -60,11 +60,20 @@ export function ConnectionsView({ onConnected }: Props) {
   return (
     <div className="conn-view">
       <header className="conn-header">
-        <div>
-          <h1>Lagune</h1>
-          <p>Connect to a PostgreSQL database to begin.</p>
+        <div className="conn-brand">
+          <span className="conn-brand-mark" aria-hidden />
+          <div>
+            <h1>Loupe</h1>
+            <p>Connect to a PostgreSQL database to begin.</p>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: "var(--space-2)", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "var(--space-2)",
+            alignItems: "center",
+          }}
+        >
           <ThemeToggle />
           <button
             className="btn btn-primary"
@@ -78,7 +87,11 @@ export function ConnectionsView({ onConnected }: Props) {
         </div>
       </header>
 
-      {error && <div className="status err" style={{ marginBottom: "var(--space-4)" }}>{error}</div>}
+      {error && (
+        <div className="status err" style={{ marginBottom: "var(--space-4)" }}>
+          {error}
+        </div>
+      )}
 
       {loading ? (
         <div className="conn-empty">Loading…</div>
@@ -86,16 +99,29 @@ export function ConnectionsView({ onConnected }: Props) {
         <div className="conn-empty">
           <p>No saved connections.</p>
           <p className="hint">
-            Create one to store its password in your OS keychain — never in this app.
+            Create one to store its password in your OS keychain — never in this
+            app.
           </p>
         </div>
       ) : (
         <div className="conn-grid">
           {connections.map((c) => (
-            <div key={c.id} className="card conn-card">
+            <div
+              key={c.id}
+              className="card conn-card"
+              style={
+                c.color
+                  ? ({ "--conn-color": c.color } as React.CSSProperties)
+                  : undefined
+              }
+              data-colored={c.color ? "" : undefined}
+            >
               <div className="conn-card-top">
                 <div className="conn-card-title">
-                  <span className="conn-label">{c.label}</span>
+                  <span className="conn-label">
+                    <span className="conn-dot" aria-hidden />
+                    {c.label}
+                  </span>
                   <span className="conn-dsn mono">
                     {c.database}@{c.host}
                   </span>
@@ -106,7 +132,8 @@ export function ConnectionsView({ onConnected }: Props) {
                 </div>
               </div>
               <div className="conn-card-meta mono">
-                {c.username} · :{c.port} · {c.sslMode === "verifyFull" ? "verify-full" : "require"}
+                {c.username} · :{c.port} ·{" "}
+                {c.sslMode === "verifyFull" ? "verify-full" : "require"}
               </div>
               <div className="conn-card-actions">
                 <button
@@ -126,7 +153,10 @@ export function ConnectionsView({ onConnected }: Props) {
                 >
                   Edit
                 </button>
-                <button className="btn btn-danger btn-sm" onClick={() => setToDelete(c)}>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => setToDelete(c)}
+                >
                   Delete
                 </button>
               </div>
@@ -153,8 +183,8 @@ export function ConnectionsView({ onConnected }: Props) {
           confirmLabel="Delete"
           body={
             <>
-              Remove <strong>{toDelete.label}</strong> and its stored password from your keychain?
-              This cannot be undone.
+              Remove <strong>{toDelete.label}</strong> and its stored password
+              from your keychain? This cannot be undone.
             </>
           }
           onConfirm={onDeleteConfirmed}

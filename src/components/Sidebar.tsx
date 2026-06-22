@@ -73,7 +73,18 @@ export function Sidebar({ reloadKey, selected, onSelect }: Props) {
 
   return (
     <div className="sidebar">
+      <div className="sidebar-head">
+        <span className="sidebar-head-title">Schema</span>
+        {!loading && !error && totalObjects > 0 && (
+          <span className="sidebar-head-count mono">
+            {totalObjects} object{totalObjects === 1 ? "" : "s"}
+          </span>
+        )}
+      </div>
       <div className="sidebar-search">
+        <span className="sidebar-search-icon" aria-hidden>
+          ⌕
+        </span>
         <input
           className="input"
           placeholder="Search tables…"
@@ -81,6 +92,16 @@ export function Sidebar({ reloadKey, selected, onSelect }: Props) {
           onChange={(e) => setQuery(e.currentTarget.value)}
           aria-label="Search tables and views"
         />
+        {query && (
+          <button
+            className="sidebar-search-clear"
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            title="Clear search"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       <div className="sidebar-scroll">

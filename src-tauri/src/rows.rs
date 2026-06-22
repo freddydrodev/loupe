@@ -3,7 +3,7 @@
 //! Identifiers (schema, table, sort column) are quoted via `sql::quote_ident`
 //! and the sort column is validated against the real column set, so a column or
 //! table name can never inject SQL. Values flow only through bound parameters.
-//! Types Lagune cannot decode natively are cast to `text` in the SELECT list so
+//! Types Loupe cannot decode natively are cast to `text` in the SELECT list so
 //! decoding never fails.
 
 use crate::cell::cell_to_json;
@@ -49,7 +49,7 @@ pub struct RowsResult {
     pub total: i64,
 }
 
-/// Returns true for types Lagune does not decode directly; these are cast to
+/// Returns true for types Loupe does not decode directly; these are cast to
 /// `text` in the SELECT so they still render (arrays, enums, interval, inet…).
 fn needs_text_cast(data_type: &str) -> bool {
     let mut t = data_type.trim().to_lowercase();

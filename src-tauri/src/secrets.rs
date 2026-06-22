@@ -4,7 +4,7 @@
 use crate::error::{AppError, AppResult};
 use keyring::Entry;
 
-const SERVICE: &str = "dev.freddydro.lagune";
+const SERVICE: &str = "dev.freddydro.Loupe";
 
 fn entry(id: &str) -> AppResult<Entry> {
     Entry::new(SERVICE, &format!("conn:{id}")).map_err(AppError::from)
