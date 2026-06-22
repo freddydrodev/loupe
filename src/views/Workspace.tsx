@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ConnectionMeta, TableRef } from "../lib/types";
 import { Sidebar } from "../components/Sidebar";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { ConnectionSwitcher } from "../components/ConnectionSwitcher";
 import { ConnectionForm } from "../components/ConnectionForm";
 import { MainPane } from "./MainPane";
@@ -56,7 +55,6 @@ export function Workspace({ connection, onDisconnect, onSwitch }: Props) {
           +
         </button>
         <div style={{ flex: 1 }} />
-        <ThemeToggle />
         <button className="btn btn-sm" onClick={onDisconnect}>
           Disconnect
         </button>

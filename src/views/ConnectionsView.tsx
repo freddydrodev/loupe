@@ -3,7 +3,6 @@ import { api } from "../lib/api";
 import type { ConnectionMeta } from "../lib/types";
 import { ConnectionForm } from "../components/ConnectionForm";
 import { Confirm } from "../components/Confirm";
-import { ThemeToggle } from "../components/ThemeToggle";
 import brandLogo from "../assets/Logo_With_Name_V.png";
 import "./ConnectionsView.css";
 
@@ -72,7 +71,6 @@ export function ConnectionsView({ onConnected }: Props) {
             alignItems: "center",
           }}
         >
-          <ThemeToggle />
           <button
             className="btn btn-primary"
             onClick={() => {

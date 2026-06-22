@@ -1,53 +1,25 @@
 /* Loupe design tokens.
- * Dark theme is the default; the light theme overrides the same variables
- * under [data-theme="light"]. Type colors are shared across both themes —
- * they encode meaning, not chrome. */
+ * Loupe ships a single light theme — it keeps the wordmark (which carries dark
+ * lettering) legible. Type colors below are theme-agnostic; they encode
+ * meaning, not chrome. */
 
-:root,
-:root[data-theme="dark"] {
-  /* Surfaces — a deep, cool slate with a hint of indigo for depth. */
-  --bg-base: #0a0e16;
-  --surface-1: #111726;
-  --surface-2: #18202f;
-  --surface-3: #1f2839;
-
-  /* Borders */
-  --border: #232c3d;
-  --border-hover: #313d52;
-
-  /* Text */
-  --text: #eaeef6;
-  --text-muted: #828da0;
-  --text-faint: #515d72;
-
-  /* Semantic */
-  --accent: #7c83ff;
-  --accent-soft: rgba(124, 131, 255, 0.14);
-  --success: #34d399;
-  --success-soft: rgba(52, 211, 153, 0.14);
-  --danger: #f4717f;
-  --danger-soft: rgba(244, 113, 127, 0.14);
-
-  /* Elevation */
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px -6px rgba(0, 0, 0, 0.5);
-  --shadow-elevated: 0 18px 48px -16px rgba(0, 0, 0, 0.7);
-  /* Faint top-edge highlight that reads as light catching an edge. */
-  --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
-
-:root[data-theme="light"] {
+:root {
+  /* Surfaces */
   --bg-base: #f3f5fa;
   --surface-1: #ffffff;
   --surface-2: #eef1f7;
   --surface-3: #e6eaf3;
 
+  /* Borders */
   --border: #dce1ec;
   --border-hover: #c2cad9;
 
+  /* Text */
   --text: #161c28;
   --text-muted: #5b6678;
   --text-faint: #8a93a6;
 
+  /* Semantic */
   --accent: #5b62e6;
   --accent-soft: rgba(91, 98, 230, 0.12);
   --success: #0f9d63;
@@ -55,8 +27,10 @@
   --danger: #d6485a;
   --danger-soft: rgba(214, 72, 90, 0.12);
 
+  /* Elevation */
   --shadow-soft: 0 1px 2px rgba(27, 34, 48, 0.05), 0 4px 12px -6px rgba(27, 34, 48, 0.1);
   --shadow-elevated: 0 18px 48px -20px rgba(27, 34, 48, 0.28);
+  /* Faint top-edge highlight that reads as light catching an edge. */
   --edge-light: inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
