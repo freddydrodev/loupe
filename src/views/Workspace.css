@@ -43,26 +43,13 @@
 .ws-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  font-size: 17px;
-}
-.ws-brand-mark {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
   flex: none;
-  background:
-    radial-gradient(
-      circle at 32% 32%,
-      color-mix(in srgb, var(--conn) 70%, white 30%),
-      var(--conn) 60%
-    );
-  box-shadow:
-    0 0 0 3px color-mix(in srgb, var(--conn) 18%, transparent),
-    inset 0 0 0 3px color-mix(in srgb, var(--bg-base) 80%, transparent);
+}
+.ws-brand-logo {
+  height: 26px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .ws-titlebar-sep {

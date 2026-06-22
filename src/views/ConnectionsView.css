@@ -16,27 +16,16 @@
 }
 .conn-brand {
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
 }
-/* The optical mark — a lens iris that catches the light, echoing the workspace
- * brand mark at a larger scale. */
-.conn-brand-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  flex: none;
-  background:
-    radial-gradient(circle at 34% 30%, color-mix(in srgb, var(--accent) 55%, white 45%), var(--accent) 58%);
-  box-shadow:
-    0 0 0 5px color-mix(in srgb, var(--accent) 14%, transparent),
-    0 8px 24px -8px color-mix(in srgb, var(--accent) 60%, transparent),
-    inset 0 0 0 7px color-mix(in srgb, var(--bg-base) 78%, transparent);
-}
-.conn-header h1 {
-  font-size: 38px;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+/* The vertical wordmark — the lens iris over the Loupe name. */
+.conn-brand-logo {
+  height: 96px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 .conn-header p {
   margin: var(--space-2) 0 0;

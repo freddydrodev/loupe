@@ -5,6 +5,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { ConnectionSwitcher } from "../components/ConnectionSwitcher";
 import { ConnectionForm } from "../components/ConnectionForm";
 import { MainPane } from "./MainPane";
+import brandLogo from "../assets/Logo_With_Name_H.png";
 import "./Workspace.css";
 
 interface Props {
@@ -38,8 +39,7 @@ export function Workspace({ connection, onDisconnect, onSwitch }: Props) {
     >
       <header className="ws-titlebar">
         <div className="ws-brand">
-          <span className="ws-brand-mark" aria-hidden />
-          Loupe
+          <img className="ws-brand-logo" src={brandLogo} alt="Loupe" />
         </div>
         <div className="ws-titlebar-sep" aria-hidden />
         <ConnectionSwitcher

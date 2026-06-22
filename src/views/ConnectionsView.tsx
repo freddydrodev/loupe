@@ -4,6 +4,7 @@ import type { ConnectionMeta } from "../lib/types";
 import { ConnectionForm } from "../components/ConnectionForm";
 import { Confirm } from "../components/Confirm";
 import { ThemeToggle } from "../components/ThemeToggle";
+import brandLogo from "../assets/Logo_With_Name_V.png";
 import "./ConnectionsView.css";
 
 interface Props {
@@ -61,11 +62,8 @@ export function ConnectionsView({ onConnected }: Props) {
     <div className="conn-view">
       <header className="conn-header">
         <div className="conn-brand">
-          <span className="conn-brand-mark" aria-hidden />
-          <div>
-            <h1>Loupe</h1>
-            <p>Connect to a PostgreSQL database to begin.</p>
-          </div>
+          <img className="conn-brand-logo" src={brandLogo} alt="Loupe" />
+          <p>Connect to a PostgreSQL database to begin.</p>
         </div>
         <div
           style={{
