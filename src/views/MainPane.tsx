@@ -42,7 +42,11 @@ export function MainPane({ connection, table }: Props) {
         ) : tab === "data" && table ? (
           <DataTab connection={connection} table={table} key={`${table.schema}.${table.name}`} />
         ) : tab === "structure" && table ? (
-          <StructureTab table={table} key={`${table.schema}.${table.name}`} />
+          <StructureTab
+            connection={connection}
+            table={table}
+            key={`${table.schema}.${table.name}`}
+          />
         ) : (
           <QueryTab connection={connection} />
         )}

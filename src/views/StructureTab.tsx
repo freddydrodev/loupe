@@ -1,11 +1,18 @@
-import { useEffect, useState } from "react";
 import { api } from "../lib/api";
-import type { ColumnInfo, ConstraintInfo, IndexInfo, TableRef } from "../lib/types";
+import { useSwr } from "../lib/swr";
+import type { ColumnInfo, ConnectionMeta, ConstraintInfo, IndexInfo, TableRef } from "../lib/types";
 import { TypeBadge } from "../components/TypeBadge";
 import "./StructureTab.css";
 
 interface Props {
+  connection: ConnectionMeta;
   table: TableRef;
+}
+
+interface Structure {
+  columns: ColumnInfo[];
+  indexes: IndexInfo[];
+  constraints: ConstraintInfo[];
 }
 
 const CONSTRAINT_LABEL: Record<ConstraintInfo["kind"], string> = {
@@ -17,37 +24,25 @@ const CONSTRAINT_LABEL: Record<ConstraintInfo["kind"], string> = {
   other: "—",
 };
 
-export function StructureTab({ table }: Props) {
-  const [columns, setColumns] = useState<ColumnInfo[]>([]);
-  const [indexes, setIndexes] = useState<IndexInfo[]>([]);
-  const [constraints, setConstraints] = useState<ConstraintInfo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-    Promise.all([
+export function StructureTab({ connection, table }: Props) {
+  const cacheKey = `struct|${connection.id}|${table.schema}.${table.name}`;
+  const { data, error, loading } = useSwr<Structure>(cacheKey, async () => {
+    const [columns, indexes, constraints] = await Promise.all([
       api.getTableColumns(table.schema, table.name),
       api.getTableIndexes(table.schema, table.name),
       api.getTableConstraints(table.schema, table.name),
-    ])
-      .then(([c, i, k]) => {
-        if (cancelled) return;
-        setColumns(c);
-        setIndexes(i);
-        setConstraints(k);
-      })
-      .catch((e) => !cancelled && setError(String(e)))
-      .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, [table.schema, table.name]);
+    ]);
+    return { columns, indexes, constraints };
+  });
 
+  // First visit with nothing cached: show a loader. Otherwise paint the last
+  // known structure (stale) and let the fetch refresh it in the background.
   if (loading) return <div className="ws-placeholder">Loading structure…</div>;
-  if (error) return <div className="struct-error status err">{error}</div>;
+  if (error && !data) return <div className="struct-error status err">{error}</div>;
+
+  const columns = data?.columns ?? [];
+  const indexes = data?.indexes ?? [];
+  const constraints = data?.constraints ?? [];
 
   return (
     <div className="struct-tab">

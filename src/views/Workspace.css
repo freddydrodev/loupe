@@ -72,6 +72,36 @@
   flex: none;
 }
 
+/* The "+" sits flush against the switcher — a quick path to a new connection. */
+.ws-add-conn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: calc(-1 * var(--space-2));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2, 8px);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: 19px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+.ws-add-conn:hover {
+  background: color-mix(in srgb, var(--conn) 12%, var(--surface-1));
+  border-color: color-mix(in srgb, var(--conn) 45%, var(--border));
+  color: var(--text);
+}
+.ws-add-conn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--conn) 60%, transparent);
+  outline-offset: 1px;
+}
+
 /* Prod connections get a louder, warmer signal in the chrome. */
 .ws[data-prod] .ws-titlebar {
   background: linear-gradient(

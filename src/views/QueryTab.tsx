@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../lib/api";
+import { evictAll } from "../lib/swr";
 import { formatInt } from "../lib/format";
 import { analyzeDestructive } from "../lib/sqlGuard";
 import type { ConnectionMeta, QueryOutcome } from "../lib/types";
@@ -33,6 +34,9 @@ export function QueryTab({ connection }: Props) {
       const r = await api.runQuery(sql, effectiveReadOnly);
       setOutcome(r);
       setLastSql(sql);
+      // A writable run may have mutated any table or its structure — drop the
+      // cached snapshots so the Data/Structure tabs revalidate next time.
+      if (!effectiveReadOnly) evictAll();
     } catch (e) {
       setError(String(e));
       setOutcome(null);

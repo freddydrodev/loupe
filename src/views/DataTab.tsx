@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
+import { useSwr, evictAll } from "../lib/swr";
 import { cellText } from "../lib/cells";
 import { formatInt } from "../lib/format";
 import { typeFamily } from "../lib/pgtypes";
@@ -18,13 +19,10 @@ interface Props {
 export function DataTab({ connection, table }: Props) {
   const pageSize = Math.max(1, connection.rowLimit || 1000);
 
-  const [result, setResult] = useState<RowsResult | null>(null);
   const [offset, setOffset] = useState(0);
   const [sort, setSort] = useState<SortSpec | null>(null);
   const [filterInput, setFilterInput] = useState("");
   const [appliedFilter, setAppliedFilter] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
   const [showImport, setShowImport] = useState(false);
 
@@ -36,28 +34,37 @@ export function DataTab({ connection, table }: Props) {
     setAppliedFilter("");
   }, [table.schema, table.name]);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const r = await api.getRows(table.schema, table.name, {
-        filter: appliedFilter.trim() || null,
-        sort,
-        limit: pageSize,
-        offset,
-      });
-      setResult(r);
-    } catch (e) {
-      setError(String(e));
-      setResult(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [table.schema, table.name, appliedFilter, sort, pageSize, offset]);
+  const filter = appliedFilter.trim();
+  // Every distinct query (table + filter + sort + page) gets its own cache slot,
+  // scoped by connection so two databases never share rows. Revisiting a slot
+  // repaints its last result instantly while the fresh fetch runs underneath.
+  const cacheKey = [
+    connection.id,
+    `${table.schema}.${table.name}`,
+    filter,
+    sort ? `${sort.column}:${sort.descending ? "desc" : "asc"}` : "",
+    pageSize,
+    offset,
+  ].join("|");
 
-  useEffect(() => {
-    void load();
-  }, [load]);
+  const {
+    data: result,
+    error,
+    loading,
+    revalidating,
+    refetch: load,
+  } = useSwr<RowsResult>(cacheKey, () =>
+    api.getRows(table.schema, table.name, {
+      filter: filter || null,
+      sort,
+      limit: pageSize,
+      offset,
+    }),
+  );
+
+  // Disable controls during any fetch; "busy" covers both the first load and a
+  // background revalidation of already-visible (stale) rows.
+  const busy = loading || revalidating;
 
   const families = useMemo(
     () => (result?.columns ?? []).map((c) => typeFamily(c.dataType)),
@@ -100,7 +107,7 @@ export function DataTab({ connection, table }: Props) {
             }}
             aria-label="Filter condition"
           />
-          <button className="btn btn-sm" onClick={applyFilter} disabled={loading}>
+          <button className="btn btn-sm" onClick={applyFilter} disabled={busy}>
             Apply
           </button>
           {appliedFilter && (
@@ -125,8 +132,8 @@ export function DataTab({ connection, table }: Props) {
         <button className="btn btn-sm" onClick={() => setShowExport(true)}>
           Export
         </button>
-        <button className="btn btn-sm" onClick={() => void load()} disabled={loading}>
-          {loading ? "Loading…" : "Refresh"}
+        <button className="btn btn-sm" onClick={() => void load()} disabled={busy}>
+          {busy ? "Refreshing…" : "Refresh"}
         </button>
       </div>
 
@@ -136,7 +143,7 @@ export function DataTab({ connection, table }: Props) {
           <p className="hint">Check the filter expression, then Apply again.</p>
         </div>
       ) : (
-        <div className="grid-scroll">
+        <div className="grid-scroll" data-stale={revalidating ? "" : undefined}>
           <table className="grid">
             <thead>
               <tr>
@@ -186,14 +193,14 @@ export function DataTab({ connection, table }: Props) {
         <button
           className="btn btn-sm"
           onClick={() => setOffset(Math.max(0, offset - pageSize))}
-          disabled={!canPrev || loading}
+          disabled={!canPrev || busy}
         >
           ‹ Prev
         </button>
         <button
           className="btn btn-sm"
           onClick={() => setOffset(offset + pageSize)}
-          disabled={!canNext || loading}
+          disabled={!canNext || busy}
         >
           Next ›
         </button>
@@ -217,7 +224,12 @@ export function DataTab({ connection, table }: Props) {
         <ImportDialog
           table={table}
           onClose={() => setShowImport(false)}
-          onImported={() => void load()}
+          onImported={() => {
+            // The import changed this table's rows; invalidate every cached page
+            // and reload the one in view.
+            evictAll();
+            void load();
+          }}
         />
       )}
     </div>

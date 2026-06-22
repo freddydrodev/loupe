@@ -38,6 +38,13 @@
   overflow: auto;
   min-height: 0;
 }
+/* Showing the previous result while fresh rows load: fade it just enough to
+   read as "updating" without hiding the data the user came to see. */
+.grid-scroll[data-stale] {
+  opacity: 0.55;
+  transition: opacity 120ms ease-in;
+  pointer-events: none;
+}
 .grid {
   border-collapse: separate;
   border-spacing: 0;
