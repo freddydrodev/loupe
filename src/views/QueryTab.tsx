@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../lib/api";
-import { evictAll } from "../lib/swr";
+import { evictAll, useSwr } from "../lib/swr";
 import { formatInt } from "../lib/format";
 import { analyzeDestructive } from "../lib/sqlGuard";
-import type { ConnectionMeta, QueryOutcome } from "../lib/types";
+import { parseFkTarget } from "../lib/relations";
+import {
+  SQL_KEYWORDS,
+  rankSuggestions,
+  sqlLiteral,
+  tablesInSql,
+  type Suggestion,
+} from "../lib/sqlComplete";
+import type { ColumnInfo, ConnectionMeta, QueryOutcome, SchemaNode } from "../lib/types";
 import { ResultGrid } from "../components/ResultGrid";
 import { Confirm } from "../components/Confirm";
 import { Switch } from "../components/Switch";
 import { ExportDialog } from "../components/ExportDialog";
+import { useSqlAutocomplete } from "../components/SqlAutocomplete";
 import "./QueryTab.css";
 
 interface Props {
@@ -26,6 +35,123 @@ export function QueryTab({ connection }: Props) {
 
   // A prod/read-only connection forces read-only regardless of the toggle.
   const effectiveReadOnly = connection.readOnly || readOnlyToggle;
+
+  // ── Autocomplete: schema-wide tables + per-table columns + FK values ────────
+  const { data: schemaTree } = useSwr<SchemaNode[]>(
+    `tree|${connection.id}`,
+    () => api.listSchemaTree(),
+  );
+
+  // All table names, and a name→schema lookup to resolve bare references.
+  const { tableNames, schemaOf } = useMemo(() => {
+    const names: string[] = [];
+    const of = new Map<string, string>();
+    for (const node of schemaTree ?? []) {
+      for (const obj of node.objects) {
+        names.push(obj.name);
+        if (!of.has(obj.name)) of.set(obj.name, node.schema);
+      }
+    }
+    return { tableNames: names, schemaOf: of };
+  }, [schemaTree]);
+
+  const referenced = useMemo(() => tablesInSql(sql), [sql]);
+
+  // Lazily-loaded columns for tables referenced in the current SQL.
+  const [colsByTable, setColsByTable] = useState<Record<string, ColumnInfo[]>>({});
+  useEffect(() => {
+    let cancelled = false;
+    for (const t of referenced) {
+      if (colsByTable[t] !== undefined) continue;
+      const schema = schemaOf.get(t);
+      if (!schema) continue;
+      void api.getTableColumns(schema, t).then((cols) => {
+        if (!cancelled) setColsByTable((prev) => ({ ...prev, [t]: cols }));
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [referenced, schemaOf, colsByTable]);
+
+  const editorAc = useSqlAutocomplete({
+    value: sql,
+    onChange: setSql,
+    getSuggestions: ({ token, fkColumn, clause }) => {
+      // Columns of every table referenced in the SQL, de-duplicated by name.
+      const columnCands = (): Suggestion[] => {
+        const seen = new Set<string>();
+        const out: Suggestion[] = [];
+        for (const t of referenced) {
+          for (const c of colsByTable[t] ?? []) {
+            if (seen.has(c.name)) continue;
+            seen.add(c.name);
+            out.push({
+              kind: "column",
+              text: c.name,
+              detail: c.dataType,
+              badge: c.isPk ? "PK" : c.fkTarget ? "FK" : undefined,
+            });
+          }
+        }
+        return out;
+      };
+      const tableCands = (): Suggestion[] =>
+        tableNames.map((name) => ({ kind: "table", text: name, detail: "table" }));
+      const kw = (list: string[]): Suggestion[] =>
+        list.map((k) => ({ kind: "keyword", text: k }));
+      // With a typed prefix, rank by it; otherwise show the full (capped) list.
+      const finish = (cands: Suggestion[]) =>
+        token ? rankSuggestions(token, cands) : cands.slice(0, 50);
+
+      // 1. Value position (`col <op> …`): enum / CHECK literals, else FK samples.
+      if (fkColumn) {
+        for (const t of referenced) {
+          const col = (colsByTable[t] ?? []).find((c) => c.name === fkColumn);
+          if (!col) continue;
+          if (col.allowedValues && col.allowedValues.length > 0) {
+            return finish(
+              col.allowedValues.map<Suggestion>((v) => ({
+                kind: "value",
+                text: sqlLiteral(v),
+              })),
+            );
+          }
+          const fk = col.fkTarget ? parseFkTarget(col.fkTarget) : null;
+          if (fk) {
+            return api
+              .fkSampleValues({ ...fk, search: token || null, limit: 50 })
+              .then((vals) =>
+                vals.map<Suggestion>((v) => ({
+                  kind: "fkvalue",
+                  text: sqlLiteral(v.value),
+                  detail: v.label ?? undefined,
+                })),
+              );
+          }
+        }
+      }
+
+      // 2. Clause-scoped candidates.
+      const AGG = ["count()", "sum()", "avg()", "min()", "max()", "coalesce()", "lower()", "upper()", "length()"];
+      const OPS = ["AND", "OR", "NOT", "IS", "NULL", "IN", "LIKE", "ILIKE", "BETWEEN", "EXISTS", "TRUE", "FALSE"];
+      switch (clause) {
+        case "from":
+          return finish(tableCands());
+        case "select":
+          return finish([{ kind: "keyword", text: "*" }, ...columnCands(), ...kw(AGG)]);
+        case "where":
+        case "on":
+          return finish([...columnCands(), ...kw(OPS)]);
+        case "orderby":
+          return finish([...columnCands(), ...kw(["ASC", "DESC"])]);
+        case "groupby":
+          return finish(columnCands());
+        default:
+          return finish([...columnCands(), ...tableCands(), ...kw(SQL_KEYWORDS)]);
+      }
+    },
+  });
 
   async function execute() {
     setRunning(true);
@@ -70,15 +196,26 @@ export function QueryTab({ connection }: Props) {
   return (
     <div className="query-tab">
       <div className="query-editor">
-        <textarea
-          className="input mono query-input"
-          placeholder="SELECT * FROM …   —   run with ⌘/Ctrl + Enter"
-          value={sql}
-          onChange={(e) => setSql(e.currentTarget.value)}
-          onKeyDown={onKeyDown}
-          spellCheck={false}
-          aria-label="SQL editor"
-        />
+        <div className="ac-wrap" ref={editorAc.wrapRef}>
+          <textarea
+            ref={editorAc.elRef as React.RefObject<HTMLTextAreaElement>}
+            className="input mono query-input"
+            placeholder="SELECT * FROM …   —   run with ⌘/Ctrl + Enter"
+            value={sql}
+            onChange={(e) => {
+              setSql(e.currentTarget.value);
+              editorAc.onInput(e);
+            }}
+            onClick={editorAc.onInput}
+            onKeyDown={(e) => {
+              if (editorAc.onKeyDown(e)) return;
+              onKeyDown(e);
+            }}
+            spellCheck={false}
+            aria-label="SQL editor"
+          />
+          {editorAc.dropdown}
+        </div>
         <div className="query-toolbar">
           <button className="btn btn-primary btn-sm" onClick={attemptRun} disabled={running || !sql.trim()}>
             {running ? "Running…" : "Run ⌘↵"}

@@ -81,6 +81,7 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
       color: meta.color,
       readOnly: meta.readOnly,
       isProd: meta.isProd,
+      prismaSchemaPath: meta.prismaSchemaPath,
     };
     setMeta(merged);
     const pw = passwordFromUri(uri);
@@ -114,6 +115,15 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
       ],
     });
     if (typeof path === "string") patch({ rootCertPath: path });
+  }
+
+  async function onBrowsePrisma() {
+    const path = await open({
+      multiple: false,
+      directory: false,
+      filters: [{ name: "Prisma schema", extensions: ["prisma"] }],
+    });
+    if (typeof path === "string") patch({ prismaSchemaPath: path });
   }
 
   async function onTest() {
@@ -445,6 +455,36 @@ export function ConnectionForm({ initial, onClose, onSaved }: Props) {
                     }
                   />
                 </div>
+              </div>
+
+              <div className="field">
+                <label htmlFor="cf-prisma">Prisma schema (optional)</label>
+                <div className="cf-cert-row">
+                  <input
+                    id="cf-prisma"
+                    className="input mono"
+                    value={meta.prismaSchemaPath ?? ""}
+                    onChange={(e) =>
+                      patch({ prismaSchemaPath: e.currentTarget.value || null })
+                    }
+                    placeholder="/path/to/schema.prisma"
+                  />
+                  <button className="btn btn-sm" onClick={onBrowsePrisma}>
+                    Browse…
+                  </button>
+                  {meta.prismaSchemaPath && (
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => patch({ prismaSchemaPath: null })}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                <span className="hint">
+                  Enriches delete warnings with Prisma model names and
+                  app-declared <code>onDelete</code> actions.
+                </span>
               </div>
             </div>
           )}

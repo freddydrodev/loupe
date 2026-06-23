@@ -168,6 +168,7 @@ mod tests {
             is_prod: false,
             statement_timeout_ms: 30_000,
             row_limit: 1_000,
+            prisma_schema_path: None,
         }
     }
 

@@ -104,3 +104,71 @@ input,
 textarea {
   user-select: text;
 }
+
+/* ── SQL autocomplete (filter bar + query editor) ───────────────────────────
+   Shared by DataTab's WHERE filter and QueryTab's SQL editor. */
+.ac-wrap {
+  position: relative;
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.ac-wrap > .input,
+.ac-wrap > textarea {
+  width: 100%;
+}
+.ac-menu {
+  position: absolute;
+  z-index: 30;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 260px;
+  overflow: auto;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2, 6px);
+  box-shadow: var(--shadow-2, 0 8px 24px rgba(0, 0, 0, 0.3));
+}
+.ac-item {
+  list-style: none;
+}
+.ac-item-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.ac-item-btn.active,
+.ac-item-btn:hover {
+  background: var(--surface-2);
+}
+.ac-text {
+  flex: none;
+}
+.ac-badge {
+  flex: none;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--type-int);
+  background: color-mix(in srgb, var(--type-int) 16%, transparent);
+}
+.ac-detail {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 11px;
+}

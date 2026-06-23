@@ -18,6 +18,8 @@ export interface ConnectionMeta {
   isProd: boolean;
   statementTimeoutMs: number;
   rowLimit: number;
+  /** Optional path to a Prisma schema file used to enrich relation info. */
+  prismaSchemaPath: string | null;
 }
 
 export type ObjectKind = "table" | "view" | "materializedView" | "foreignTable";
@@ -47,6 +49,8 @@ export interface ColumnInfo {
   default: string | null;
   isPk: boolean;
   fkTarget: string | null;
+  /** Permitted values (native enum labels or single-column CHECK literals), else null. */
+  allowedValues: string[] | null;
 }
 
 export interface IndexInfo {
@@ -89,6 +93,90 @@ export interface RowsResult {
   columns: RowColumn[];
   rows: Cell[][];
   total: number;
+}
+
+// ── Row writes & relations ───────────────────────────────────────────────────
+
+export type OnDeleteAction =
+  | "noAction"
+  | "restrict"
+  | "cascade"
+  | "setNull"
+  | "setDefault";
+
+/** A foreign key in another table that points at the current table. */
+export interface ReferencingConstraint {
+  constraintName: string;
+  referencingSchema: string;
+  referencingTable: string;
+  /** Columns on the current (referenced) table. */
+  referencedColumns: string[];
+  /** Columns on the referencing table, aligned to referencedColumns. */
+  referencingColumns: string[];
+  onDelete: OnDeleteAction;
+  /** Prisma model mapped to the referencing table, when a Prisma schema is set. */
+  prismaModel: string | null;
+  /** `onDelete` declared in the Prisma schema (may differ from the DB action). */
+  prismaOnDelete: string | null;
+}
+
+export interface CellEdit {
+  column: string;
+  value: Cell;
+}
+
+/** Identifies a row by one of its primary-key columns and that column's value. */
+export interface PkPredicate {
+  column: string;
+  value: Cell;
+}
+
+export interface UpdateRowOpts {
+  schema: string;
+  table: string;
+  edits: CellEdit[];
+  /** Original primary-key values identifying the row. */
+  pk: PkPredicate[];
+}
+
+export interface UpdateResult {
+  columns: RowColumn[];
+  row: Cell[];
+  affected: number;
+}
+
+export interface BulkUpdateOpts {
+  schema: string;
+  table: string;
+  column: string;
+  value: Cell;
+  /** One full PK predicate per row to update. */
+  pks: PkPredicate[][];
+}
+
+export interface DeleteRowsOpts {
+  schema: string;
+  table: string;
+  /** One full PK predicate per row to delete. */
+  pks: PkPredicate[][];
+}
+
+export interface AffectedResult {
+  affected: number;
+}
+
+export interface FkSampleOpts {
+  schema: string;
+  table: string;
+  column: string;
+  labelColumn?: string | null;
+  search?: string | null;
+  limit: number;
+}
+
+export interface FkSample {
+  value: Cell;
+  label: string | null;
 }
 
 export interface ImportPreview {
@@ -194,6 +282,7 @@ export function blankConnection(): ConnectionMeta {
     readOnly: false,
     isProd: false,
     statementTimeoutMs: 30_000,
-    rowLimit: 1_000,
+    rowLimit: 100,
+    prismaSchemaPath: null,
   };
 }

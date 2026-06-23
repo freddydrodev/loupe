@@ -3,6 +3,7 @@
 // The webview never receives credentials or a connection string. It talks to
 // the Rust core exclusively through the Tauri commands registered below.
 
+mod bind;
 mod cell;
 mod commands;
 mod db;
@@ -11,6 +12,8 @@ mod export;
 mod import;
 mod introspect;
 mod model;
+mod mutate;
+mod prisma;
 mod query;
 mod rows;
 mod secrets;
@@ -56,6 +59,11 @@ pub fn run() {
             commands::export_data,
             commands::import_preview,
             commands::import_data,
+            commands::update_row,
+            commands::bulk_update_column,
+            commands::delete_rows,
+            commands::get_referencing_constraints,
+            commands::fk_sample_values,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Loupe");

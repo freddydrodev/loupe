@@ -25,7 +25,7 @@ fn default_statement_timeout_ms() -> u32 {
 }
 
 fn default_row_limit() -> u32 {
-    1_000
+    100
 }
 
 /// Non-secret metadata for a saved connection. Persisted to the app config dir.
@@ -59,4 +59,8 @@ pub struct ConnectionMeta {
     pub statement_timeout_ms: u32,
     #[serde(default = "default_row_limit")]
     pub row_limit: u32,
+    /// Optional path to a Prisma schema file used to enrich relation info
+    /// (model names and app-declared `onDelete` actions). `None` = DB-only.
+    #[serde(default)]
+    pub prisma_schema_path: Option<String>,
 }

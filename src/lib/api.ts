@@ -3,19 +3,27 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import type {
+  AffectedResult,
+  BulkUpdateOpts,
   ColumnInfo,
   ConnectionMeta,
   ConstraintInfo,
+  DeleteRowsOpts,
   ExportOpts,
   ExportResult,
+  FkSample,
+  FkSampleOpts,
   GetRowsOpts,
   ImportOpts,
   ImportPreview,
   ImportReport,
   IndexInfo,
   QueryOutcome,
+  ReferencingConstraint,
   RowsResult,
   SchemaNode,
+  UpdateResult,
+  UpdateRowOpts,
 } from "./types";
 
 export const api = {
@@ -66,4 +74,17 @@ export const api = {
   importPreview: (path: string) => invoke<ImportPreview>("import_preview", { path }),
 
   importData: (opts: ImportOpts) => invoke<ImportReport>("import_data", { opts }),
+
+  // ── Row writes & relations ─────────────────────────────────────────────────
+  updateRow: (opts: UpdateRowOpts) => invoke<UpdateResult>("update_row", { opts }),
+
+  bulkUpdateColumn: (opts: BulkUpdateOpts) =>
+    invoke<AffectedResult>("bulk_update_column", { opts }),
+
+  deleteRows: (opts: DeleteRowsOpts) => invoke<AffectedResult>("delete_rows", { opts }),
+
+  getReferencingConstraints: (schema: string, table: string) =>
+    invoke<ReferencingConstraint[]>("get_referencing_constraints", { schema, table }),
+
+  fkSampleValues: (opts: FkSampleOpts) => invoke<FkSample[]>("fk_sample_values", { opts }),
 };

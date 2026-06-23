@@ -5,8 +5,14 @@ use crate::db::{open_pool, Active, AppState};
 use crate::error::AppError;
 use crate::export::{self, ExportOpts, ExportResult};
 use crate::import::{self, ImportOpts, ImportPreview, ImportReport};
-use crate::introspect::{self, ColumnInfo, ConstraintInfo, IndexInfo, SchemaNode};
+use crate::introspect::{
+    self, ColumnInfo, ConstraintInfo, IndexInfo, ReferencingConstraint, SchemaNode,
+};
 use crate::model::{ConnectionMeta, SslMode};
+use crate::mutate::{
+    self, AffectedResult, BulkUpdateOpts, DeleteRowsOpts, FkSample, FkSampleOpts, UpdateResult,
+    UpdateRowOpts,
+};
 use crate::query::{self, QueryOpts, QueryOutcome};
 use crate::rows::{self, GetRowsOpts, RowsResult};
 use crate::secrets;
@@ -224,6 +230,68 @@ pub async fn get_table_constraints(
     Ok(introspect::table_constraints(&pool, &schema, &table).await?)
 }
 
+// ── Row writes (edit / bulk edit / delete) ───────────────────────────────────
+
+#[tauri::command]
+pub async fn update_row(
+    state: State<'_, AppState>,
+    opts: UpdateRowOpts,
+) -> Result<UpdateResult, String> {
+    let (pool, meta) = state.active_meta().await?;
+    if meta.read_only {
+        return Err("This connection is read-only.".into());
+    }
+    Ok(mutate::update_row(&pool, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn bulk_update_column(
+    state: State<'_, AppState>,
+    opts: BulkUpdateOpts,
+) -> Result<AffectedResult, String> {
+    let (pool, meta) = state.active_meta().await?;
+    if meta.read_only {
+        return Err("This connection is read-only.".into());
+    }
+    Ok(mutate::bulk_update_column(&pool, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn delete_rows(
+    state: State<'_, AppState>,
+    opts: DeleteRowsOpts,
+) -> Result<AffectedResult, String> {
+    let (pool, meta) = state.active_meta().await?;
+    if meta.read_only {
+        return Err("This connection is read-only.".into());
+    }
+    Ok(mutate::delete_rows(&pool, &opts).await?)
+}
+
+#[tauri::command]
+pub async fn get_referencing_constraints(
+    state: State<'_, AppState>,
+    schema: String,
+    table: String,
+) -> Result<Vec<ReferencingConstraint>, String> {
+    let (pool, meta) = state.active_meta().await?;
+    let mut refs = introspect::referencing_constraints(&pool, &schema, &table).await?;
+    // Best-effort enrichment from an associated Prisma schema; never fatal.
+    if let Some(path) = meta.prisma_schema_path.as_deref() {
+        crate::prisma::enrich_referencing(&mut refs, path);
+    }
+    Ok(refs)
+}
+
+#[tauri::command]
+pub async fn fk_sample_values(
+    state: State<'_, AppState>,
+    opts: FkSampleOpts,
+) -> Result<Vec<FkSample>, String> {
+    let pool = state.pool().await?;
+    Ok(mutate::fk_sample_values(&pool, &opts).await?)
+}
+
 /// Parses a libpq/URL connection string into editable, **secret-free** metadata.
 /// Any password in the string is intentionally dropped — the user re-enters it,
 /// keeping the frontend free of credentials.
@@ -251,5 +319,6 @@ pub async fn parse_connection_string(url: String) -> Result<ConnectionMeta, Stri
         is_prod: false,
         statement_timeout_ms: 30_000,
         row_limit: 1_000,
+        prisma_schema_path: None,
     })
 }

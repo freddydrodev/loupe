@@ -189,3 +189,232 @@
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* ── Editing: banners, selection, inline editor, bulk bar ──────────────────── */
+.data-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-muted);
+  font-size: 12px;
+  flex: none;
+}
+.data-banner-err {
+  background: color-mix(in srgb, var(--danger, #f4717f) 12%, var(--surface-1));
+}
+.data-banner-err .btn {
+  margin-left: auto;
+}
+
+/* Selection column */
+.sel-h,
+.sel-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface-1);
+  border-right: 1px solid var(--border);
+  text-align: center;
+  padding: 4px var(--space-2);
+  width: 30px;
+  min-width: 30px;
+}
+.grid thead .sel-h {
+  z-index: 2;
+  border-bottom: 1px solid var(--border);
+}
+/* When a selection column is present, the rownum is no longer the leftmost
+   sticky cell, so it should not pin to the very left edge. */
+.grid thead .sel-h ~ .rownum-h,
+.sel-cell ~ .rownum {
+  position: static;
+}
+.grid tbody tr[data-selected] td {
+  background: color-mix(in srgb, var(--conn, var(--accent)) 16%, transparent);
+}
+
+.cell-editable {
+  cursor: text;
+}
+.cell-editing {
+  white-space: normal;
+  max-width: 420px;
+  background: var(--surface-1);
+}
+
+/* Inline / bulk value editor */
+.cell-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+.cell-editor-input .input {
+  width: 100%;
+  height: 28px;
+}
+.cell-editor-json {
+  height: 90px;
+  resize: vertical;
+}
+.cell-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cell-editor-null {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.cell-editor-err {
+  font-size: 11px;
+}
+
+/* Foreign-key combobox */
+.fk-picker {
+  position: relative;
+}
+.fk-picker .input {
+  width: 100%;
+}
+.fk-options {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 220px;
+  overflow: auto;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2, 6px);
+  box-shadow: var(--shadow-2, 0 8px 24px rgba(0, 0, 0, 0.3));
+}
+.fk-opt {
+  list-style: none;
+}
+.fk-opt.muted {
+  padding: 6px 8px;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+.fk-opt-btn {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.fk-opt-btn:hover {
+  background: var(--surface-2);
+}
+.fk-opt-label {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Bulk action bar */
+.bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--conn, var(--accent)) 10%, var(--surface-1));
+  flex: none;
+}
+.bulk-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+.bulk-set,
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.bulk-set .cell-editor {
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+}
+.bulk-set .cell-editor-input {
+  min-width: 200px;
+}
+.bulk-set-label {
+  font-size: 11px;
+  color: var(--type-int);
+  font-weight: 600;
+}
+.bulk-col-select {
+  height: 28px;
+}
+
+.footer-hint {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Delete confirmation */
+.del-confirm {
+  display: grid;
+  gap: var(--space-2);
+}
+.del-refs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.del-ref {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 0;
+  border-top: 1px solid var(--border);
+}
+.del-ref-action {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.del-ref-restrict .del-ref-action,
+.del-ref-noAction .del-ref-action {
+  color: var(--danger, #f4717f);
+}
+.del-ref-cascade .del-ref-action {
+  color: var(--type-datetime);
+}
+.del-ref-setNull .del-ref-action,
+.del-ref-setDefault .del-ref-action {
+  color: var(--text-muted);
+}
+.del-ref-effect {
+  color: var(--text-muted);
+}
+.del-ref-prisma {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--type-uuid);
+}
